@@ -7,6 +7,9 @@ class pieceMove:
         self.file = file
         self.promotion = promotion
 
+    def printPiece(self):
+        print(self.piece.type, self.rank, self.file, sep="\t")
+
 def getNewLetter(file, increment):
     return  chr(ord(file) +  increment)
 
@@ -37,7 +40,7 @@ def getPawnMove(piece, me, opp):
 
     # Pawn has not moved from base location
     # And the position immeidately front of the pawn is not blocked
-    if piece.rank == 2 and forwardMove is not None:
+    if not piece.has_moved and forwardMove is not None:
         for p in me.pieces + opp.pieces:
             if piece.rank + me.rank_direction * 2 == p.rank and piece.file == p.file:
                 doubleForwardMove = None
@@ -178,7 +181,26 @@ def getRookMove(piece, me, opp):
     return myMoves
 
 def getKnightMove(piece, me, opp):
-    return []
+    myPosList = getPieceCoordList(me)
+
+    possiblePosList = []
+    finalResult = []
+    possiblePosList.append(pieceMove(piece, piece.rank + 1, getNewLetter(piece.file, 2)))
+    possiblePosList.append(pieceMove(piece, piece.rank + 1, getNewLetter(piece.file, -2)))
+    possiblePosList.append(pieceMove(piece, piece.rank - 1, getNewLetter(piece.file, 2)))
+    possiblePosList.append(pieceMove(piece, piece.rank - 1, getNewLetter(piece.file, -2)))
+    possiblePosList.append(pieceMove(piece, piece.rank + 2, getNewLetter(piece.file, 1)))
+    possiblePosList.append(pieceMove(piece, piece.rank + 2, getNewLetter(piece.file, -1)))
+    possiblePosList.append(pieceMove(piece, piece.rank - 2, getNewLetter(piece.file, 1)))
+    possiblePosList.append(pieceMove(piece, piece.rank - 2, getNewLetter(piece.file, -1)))
+
+    for move in possiblePosList:
+        rank = move.rank
+        file = move.file
+        if 1 <= rank <= 8 and  ord("a") <= ord(file) <= ord("h") and (rank,file) not in myPosList:
+            finalResult.append(move)
+
+    return finalResult
 
 def getQueenMove(piece, me, opp):
     return getBishopMove(piece,me,opp) + getRookMove(piece,me,opp)
