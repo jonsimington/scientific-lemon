@@ -28,7 +28,7 @@ def getPawnMove(piece, me, opp):
     doubleForwardMove = pieceMove(piece, piece.rank + me.rank_direction * 2, piece.file)
 
     for p in me.pieces + opp.pieces:
-        if piece.rank + me.rank_direction == p.rank and piece.file == p.file:
+        if piece.rank + me.rank_direction == p.rank and piece.file is p.file:
             forwardMove = None
             break
 
@@ -42,7 +42,7 @@ def getPawnMove(piece, me, opp):
     # And the position immeidately front of the pawn is not blocked
     if not piece.has_moved and forwardMove is not None:
         for p in me.pieces + opp.pieces:
-            if piece.rank + me.rank_direction * 2 == p.rank and piece.file == p.file:
+            if piece.rank + (me.rank_direction * 2) == p.rank and piece.file is p.file:
                 doubleForwardMove = None
                 break
     else:
@@ -206,4 +206,23 @@ def getQueenMove(piece, me, opp):
     return getBishopMove(piece,me,opp) + getRookMove(piece,me,opp)
 
 def getKingMove(piece, me, opp):
-    return []
+    myPosList = getPieceCoordList(me)
+
+    possiblePosList = []
+    finalResult = []
+    possiblePosList.append(pieceMove(piece, piece.rank + 1, getNewLetter(piece.file, 1)))
+    possiblePosList.append(pieceMove(piece, piece.rank + 1, getNewLetter(piece.file, 0)))
+    possiblePosList.append(pieceMove(piece, piece.rank + 1, getNewLetter(piece.file, -1)))
+    possiblePosList.append(pieceMove(piece, piece.rank - 1, getNewLetter(piece.file, 1)))
+    possiblePosList.append(pieceMove(piece, piece.rank - 1, getNewLetter(piece.file, 0)))
+    possiblePosList.append(pieceMove(piece, piece.rank - 1, getNewLetter(piece.file, -1)))
+    possiblePosList.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, 1)))
+    possiblePosList.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, -1)))
+
+    for move in possiblePosList:
+        rank = move.rank
+        file = move.file
+        if 1 <= rank <= 8 and ord("a") <= ord(file) <= ord("h") and (rank, file) not in myPosList:
+            finalResult.append(move)
+
+    return finalResult

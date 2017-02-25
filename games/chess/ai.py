@@ -106,8 +106,9 @@ class AI(BaseAI):
             # Removes empty list that may be returned if not valid moves were found
         validMoves = [x for x in moveList if x != []]
 
-        #print(moveList)
         moveToMake = random.choice(validMoves)
+
+        moveToMake.printPiece()
 
         moveToMake.piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
 
