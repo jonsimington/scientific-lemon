@@ -4,6 +4,7 @@ from joueur.base_ai import BaseAI
 from games.chess.generateMoves import *
 import random
 
+
 class AI(BaseAI):
     """ The basic AI functions that are the same between games. """
 
@@ -75,7 +76,7 @@ class AI(BaseAI):
         moveList = []
         pieces = self.player.pieces
         for p in pieces:
-            if p.type  == "Pawn":
+            if p.type == "Pawn":
                 result = (getPawnMove(p, self.player, self.player.opponent))
                 for moves in result:
                     moveList.append(moves)
@@ -103,7 +104,7 @@ class AI(BaseAI):
                 for moves in result:
                     moveList.append(moves)
 
-            # Removes empty list that may be returned if not valid moves were found
+                    # Removes empty list that may be returned if not valid moves were found
         validMoves = [x for x in moveList if x != []]
 
         moveToMake = random.choice(validMoves)
@@ -112,7 +113,7 @@ class AI(BaseAI):
 
         moveToMake.piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
 
-        #p.move(p.file, p.rank + self.player.rank_direction)
+        # p.move(p.file, p.rank + self.player.rank_direction)
 
 
 
