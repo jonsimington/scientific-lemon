@@ -31,9 +31,9 @@ def getPawnMove(piece, me, opp):
 
     for p in opp.pieces:
         if piece.rank + me.rank_direction == p.rank and getNewLetter(piece.file,1) == p.file:
-            pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file,1))
+            myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file,1)))
         if piece.rank + me.rank_direction == p.rank and getNewLetter(piece.file, -1) == p.file:
-            pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, -1))
+            myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, -1)))
 
     # Pawn has not moved from base location
     # And the position immeidately front of the pawn is not blocked
