@@ -1,8 +1,8 @@
 # This is where you build your AI for the Chess game.
 
 from joueur.base_ai import BaseAI
+from games.chess.generateMoves import *
 import random
-
 
 class AI(BaseAI):
     """ The basic AI functions that are the same between games. """
@@ -15,7 +15,7 @@ class AI(BaseAI):
             str: The name of your Player.
         """
 
-        return "Chess Python Player"  # REPLACE THIS WITH YOUR TEAM NAME
+        return "Tim Buesking"  # REPLACE THIS WITH YOUR TEAM NAME
 
     def start(self):
         """ This is called once the game starts and your AI knows its playerID
@@ -71,10 +71,49 @@ class AI(BaseAI):
         print("Time Remaining: " + str(self.player.time_remaining) + " ns")
 
         # 4) make a random (and probably invalid) move.
-        random_piece = random.choice(self.player.pieces)
-        random_file = chr(ord("a") + random.randrange(8))
-        random_rank = random.randrange(8) + 1
-        random_piece.move(random_file, random_rank)
+
+        moveList = []
+        pieces = self.player.pieces
+        for p in pieces:
+            if p.type  == "Pawn":
+                result = (getPawnMove(p, self.player, self.player.opponent))
+                for moves in result:
+                    moveList.append(moves)
+
+            elif p.type == "Bishop":
+                result = getBishopMove(p, self.player, self.player.opponent)
+                for moves in result:
+                    moveList.append(moves)
+
+            elif p.type == "Rook":
+                result = getRookMove(p, self.player, self.player.opponent)
+                for moves in result:
+                    moveList.append(moves)
+            elif p.type == "Knight":
+                result = getKnightMove(p, self.player, self.player.opponent)
+                for moves in result:
+                    moveList.append(moves)
+            elif p.type == "Queen":
+                result = getQueenMove(p, self.player, self.player.opponent)
+                for moves in result:
+                    moveList.append(moves)
+            # King
+            else:
+                result = getKingMove(p, self.player, self.player.opponent)
+                for moves in result:
+                    moveList.append(moves)
+
+            # Removes empty list that may be returned if not valid moves were found
+        validMoves = [x for x in moveList if x != []]
+
+        #print(moveList)
+        moveToMake = random.choice(validMoves)
+
+        moveToMake.piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
+
+        #p.move(p.file, p.rank + self.player.rank_direction)
+
+
 
         return True  # to signify we are done with our turn.
 
