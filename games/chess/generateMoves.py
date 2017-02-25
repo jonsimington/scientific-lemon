@@ -1,3 +1,5 @@
+import random
+
 class pieceMove:
     def __init__(self, piece, rank, file, promotion=""):
         self.piece = piece
@@ -19,12 +21,41 @@ def getPieceCoordList(player):
 def getPawnMove(piece, me, opp):
     myMoves = []
 
+    forwardMove = pieceMove(piece, piece.rank + me.rank_direction, piece.file)
+    doubleForwardMove = pieceMove(piece, piece.rank + me.rank_direction * 2, piece.file)
+
     for p in me.pieces + opp.pieces:
         if piece.rank + me.rank_direction == p.rank and piece.file == p.file:
-            return []
+            forwardMove = None
+            break
+
+    for p in opp.pieces:
+        if piece.rank + me.rank_direction == p.rank and getNewLetter(piece.file,1) == p.file:
+            pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file,1))
+        if piece.rank + me.rank_direction == p.rank and getNewLetter(piece.file, -1) == p.file:
+            pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, -1))
+
+    # Pawn has not moved from base location
+    # And the position immeidately front of the pawn is not blocked
+    if piece.rank == 2 and forwardMove is not None:
+        for p in me.pieces + opp.pieces:
+            if piece.rank + me.rank_direction * 2 == p.rank and piece.file == p.file:
+                doubleForwardMove = None
+                break
+    else:
+        doubleForwardMove = None
+
+    if forwardMove is not None:
+        myMoves.append(forwardMove)
+
+    if doubleForwardMove is not None:
+        myMoves.append(doubleForwardMove)
 
 
-    myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, piece.file ))
+    for move in myMoves:
+        if move.rank == 1 or move.rank == 8:
+            move.promotion = random.choice(["Queen","Rook", "Bishop", "Knight"])
+
     return myMoves
 
 def getBishopMove(piece, me, opp):
