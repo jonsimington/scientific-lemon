@@ -43,7 +43,9 @@ def getPawnMove(piece, me, opp):
 
     # Pawn has not moved from base location
     # And the position immeidately front of the pawn is not blocked
-    if not piece.has_moved and forwardMove is not None and ( (piece.rank == 1 and piece.owner.color == "White") or (piece.rank == 8 and piece.owner.color == "Black") ):
+    if not piece.has_moved and forwardMove is not None and (
+                (piece.rank == 1 and piece.owner.color == "White") or (
+                            piece.rank == 8 and piece.owner.color == "Black")):
         for p in me.pieces + opp.pieces:
             if piece.rank + (me.rank_direction * 2) == p.rank and piece.file is p.file:
                 doubleForwardMove = None
@@ -69,7 +71,6 @@ def getBishopMove(piece, me, opp):
     myPosList = getPieceCoordList(me)
     oppPosList = getPieceCoordList(opp)
 
-
     # Flags to indicate if the piece can continue to move in that direction
     # Set to false if a boundary is hit or another piece is hit
     upRight = True
@@ -79,7 +80,8 @@ def getBishopMove(piece, me, opp):
 
     for i in range(1, 8):
         # Check if can still move up and to the right
-        if upRight and piece.rank + i != 9 and getNewLetter(piece.file, i) is not "i" and (piece.rank + i, getNewLetter(piece.file, i)) not in myPosList:
+        if upRight and piece.rank + i != 9 and getNewLetter(piece.file, i) is not "i" and (
+                    piece.rank + i, getNewLetter(piece.file, i)) not in myPosList:
             # Check if hitting an opponent piece
             if (piece.rank + i, getNewLetter(piece.file, i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
@@ -91,7 +93,8 @@ def getBishopMove(piece, me, opp):
 
         # Check if we go too far up or to the left
         # ' is the character that proceeds a in char values
-        if upLeft and piece.rank + i != 9 and getNewLetter(piece.file, -i) is not "`" and (piece.rank + i, getNewLetter(piece.file, -i)) not in myPosList:
+        if upLeft and piece.rank + i != 9 and getNewLetter(piece.file, -i) is not "`" and (
+                    piece.rank + i, getNewLetter(piece.file, -i)) not in myPosList:
             # Check if hitting an opponent piece
             if (piece.rank + i, getNewLetter(piece.file, -i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, -i)))
@@ -102,7 +105,8 @@ def getBishopMove(piece, me, opp):
             upLeft = False
 
         # Check if we go too far down or to the right
-        if downRight and piece.rank - i != 0 and getNewLetter(piece.file, i) is not "i" and (piece.rank - i, getNewLetter(piece.file, i)) not in myPosList:
+        if downRight and piece.rank - i != 0 and getNewLetter(piece.file, i) is not "i" and (
+                    piece.rank - i, getNewLetter(piece.file, i)) not in myPosList:
             # Check if hitting an opponent piece
             if (piece.rank - i, getNewLetter(piece.file, i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, i)))
@@ -114,7 +118,8 @@ def getBishopMove(piece, me, opp):
 
         # Check if we go too far down or to the left
         # ' is the character that proceeds a in char values
-        if downLeft and piece.rank - i != 0 and getNewLetter(piece.file, -i) is not "`" and (piece.rank - i, getNewLetter(piece.file, -i)) not in myPosList:
+        if downLeft and piece.rank - i != 0 and getNewLetter(piece.file, -i) is not "`" and (
+                    piece.rank - i, getNewLetter(piece.file, -i)) not in myPosList:
             # Check if hitting an opponent piece
             if (piece.rank - i, getNewLetter(piece.file, -i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, -i)))
@@ -160,7 +165,8 @@ def getRookMove(piece, me, opp):
         else:
             down = False
 
-        if right and getNewLetter(piece.file, i) is not "i" and (piece.rank, getNewLetter(piece.file, i)) not in myPosList:
+        if right and getNewLetter(piece.file, i) is not "i" and (
+                piece.rank, getNewLetter(piece.file, i)) not in myPosList:
             if (piece.rank, getNewLetter(piece.file, i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, i)))
                 right = False
@@ -169,7 +175,8 @@ def getRookMove(piece, me, opp):
         else:
             right = False
 
-        if left and getNewLetter(piece.file, -i) is not "`" and (piece.rank, getNewLetter(piece.file, -i)) not in myPosList:
+        if left and getNewLetter(piece.file, -i) is not "`" and (
+                piece.rank, getNewLetter(piece.file, -i)) not in myPosList:
             # Hit enemy piece
             if (piece.rank, getNewLetter(piece.file, -i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, -i)))
@@ -231,28 +238,34 @@ def getKingMove(piece, me, opp):
             finalResult.append(move)
 
     # Check that King has not moved
-    if piece.has_moved is False and piece.file == "e" and ((piece.rank == 1 and piece.owner.color == "White") or (piece.rank == 8 and piece.owner.color == "Black") ):
+    if piece.has_moved is False and piece.file == "e" and (
+                (piece.rank == 1 and piece.owner.color == "White") or (
+                            piece.rank == 8 and piece.owner.color == "Black")):
 
         kingRook = False
         queenRook = False
 
         # Check if the rooks still exist and meet conditions for castling
         for p in me.pieces:
-            if p.has_moved is False and p.type == "Rook" and p.file == "h" and ((p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black") ):
+            if p.has_moved is False and p.type == "Rook" and p.file == "h" and (
+                        (p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
 
                 kingRook = True
 
-            elif p.has_moved is False and p.type == "Rook" and p.file == "a" and ((p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black") ):
+            elif p.has_moved is False and p.type == "Rook" and p.file == "a" and (
+                        (p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
                 queenRook = True
-
 
         if kingRook:
             kingSideMove = pieceMove(piece, piece.rank, "h")
             finalResult.append(kingSideMove)
             # Check King is not blocked
-            for i in range (1,3):
-                if (piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList) or isSquareAttacked(opp, piece.rank, getNewLetter(piece.file, i )):
-
+            for i in range(1, 3):
+                if (piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList) or isSquareAttacked(opp,
+                                                                                                          piece.rank,
+                                                                                                          getNewLetter(
+                                                                                                              piece.file,
+                                                                                                              i)):
                     finalResult.remove(kingSideMove)
                     break
 
@@ -262,7 +275,11 @@ def getKingMove(piece, me, opp):
 
             # Check Queen is not blocked
             for i in range(1, 4):
-                if (piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList) or isSquareAttacked(opp, piece.rank, getNewLetter(piece.file, i )):
+                if (piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList) or isSquareAttacked(opp,
+                                                                                                           piece.rank,
+                                                                                                           getNewLetter(
+                                                                                                               piece.file,
+                                                                                                               i)):
                     finalResult.remove(queenSideMove)
                     break
 

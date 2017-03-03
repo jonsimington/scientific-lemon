@@ -95,16 +95,16 @@ class AI(BaseAI):
                 for moves in result:
                     moveList.append(moves)
 
-                    # Removes empty list that may be returned if not valid moves were found
+        # Removes empty list that may be returned if not valid moves were found
         validMoves = [x for x in moveList if x != []]
 
         moveToMake = random.choice(validMoves)
 
-
         # Prints moves that the piece that moves could make
         for moves in validMoves:
             if moves.piece == moveToMake.piece:
-                print( moves.piece.type +  " (" + moves.piece.file + str(moves.piece.rank) + ")" + " to " + "(" + moves.file + str(moves.rank) + ")")
+                print(moves.piece.type + " (" + moves.piece.file + str(
+                    moves.piece.rank) + ")" + " to " + "(" + moves.file + str(moves.rank) + ")")
 
         moveToMake.piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
 
