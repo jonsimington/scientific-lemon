@@ -53,26 +53,17 @@ class AI(BaseAI):
                   function.
         """
 
-        # Here is where you'll want to code your AI.
-
-        # We've provided sample code that:
-        #    1) prints the board to the console
-        #    2) prints the opponent's last move to the console
-        #    3) prints how much time remaining this AI has to calculate moves
-        #    4) makes a random (and probably invalid) move.
-
-        # 1) print the board to the console
+        # print the board to the console
         self.print_current_board()
 
-        # 2) print the opponent's last move to the console
+        # print the opponent's last move to the console
         if len(self.game.moves) > 0:
             print("Opponent's Last Move: '" + self.game.moves[-1].san + "'")
 
-        # 3) print how much time remaining this AI has to calculate moves
+        # print how much time remaining this AI has to calculate moves
         print("Time Remaining: " + str(self.player.time_remaining) + " ns")
 
-        # 4) make a random (and probably invalid) move.
-
+        # calculate my move
         moveList = []
         pieces = self.player.pieces
         for p in pieces:
@@ -109,13 +100,13 @@ class AI(BaseAI):
 
         moveToMake = random.choice(validMoves)
 
-        moveToMake.printPiece()
+
+        # Prints moves that the piece that moves could make
+        for moves in validMoves:
+            if moves.piece == moveToMake.piece:
+                print( moves.piece.type +  " (" + moves.piece.file + str(moves.piece.rank) + ")" + " to " + "(" + moves.file + str(moves.rank) + ")")
 
         moveToMake.piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
-
-        # p.move(p.file, p.rank + self.player.rank_direction)
-
-
 
         return True  # to signify we are done with our turn.
 
