@@ -69,55 +69,61 @@ def getBishopMove(piece, me, opp):
     myPosList = getPieceCoordList(me)
     oppPosList = getPieceCoordList(opp)
 
-    for i in range(1, 8):
-        if piece.rank + i == 9 or getNewLetter(piece.file, i) is "i":
-            break
-        else:
-            if (piece.rank + i, getNewLetter(piece.file, i)) in myPosList:
-                break
-            elif (piece.rank + i, getNewLetter(piece.file, i)) in oppPosList:
-                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
-                break
-            else:
-                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
+
+    # Flags to indicate if the piece can continue to move in that direction
+    # Set to false if a boundary is hit or another piece is hit
+    upRight = True
+    upLeft = True
+    downRight = True
+    downLeft = True
 
     for i in range(1, 8):
+        # Check if can still move up and to the right
+        if upRight and piece.rank + i != 9 and getNewLetter(piece.file, i) is not "i" and (piece.rank + i, getNewLetter(piece.file, i)) not in myPosList:
+            # Check if hitting an opponent piece
+            if (piece.rank + i, getNewLetter(piece.file, i)) in oppPosList:
+                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
+                upRight = False
+            else:
+                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
+        else:
+            upRight = False
+
         # Check if we go too far up or to the left
         # ' is the character that proceeds a in char values
-        if piece.rank + i == 9 or getNewLetter(piece.file, -i) is "`":
-            break
-        else:
-            if (piece.rank + i, getNewLetter(piece.file, -i)) in myPosList:
-                break
-            elif (piece.rank + i, getNewLetter(piece.file, -i)) in oppPosList:
+        if upLeft and piece.rank + i != 9 and getNewLetter(piece.file, -i) is not "`" and (piece.rank + i, getNewLetter(piece.file, -i)) not in myPosList:
+            # Check if hitting an opponent piece
+            if (piece.rank + i, getNewLetter(piece.file, -i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, -i)))
-                break
+                upLeft = False
             else:
                 myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, -i)))
-
-    for i in range(1, 8):
-        if piece.rank - i == 0 or getNewLetter(piece.file, i) is "i":
-            break
         else:
-            if (piece.rank - i, getNewLetter(piece.file, i)) in myPosList:
-                break
-            elif (piece.rank - i, getNewLetter(piece.file, i)) in oppPosList:
+            upLeft = False
+
+        # Check if we go too far down or to the right
+        if downRight and piece.rank - i != 0 and getNewLetter(piece.file, i) is not "i" and (piece.rank - i, getNewLetter(piece.file, i)) not in myPosList:
+            # Check if hitting an opponent piece
+            if (piece.rank - i, getNewLetter(piece.file, i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, i)))
-                break
+                downRight = False
             else:
                 myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, i)))
-
-    for i in range(1, 8):
-        if piece.rank - i == 0 or getNewLetter(piece.file, -i) is "`":
-            break
         else:
-            if (piece.rank - i, getNewLetter(piece.file, -i)) in myPosList:
-                break
-            elif (piece.rank - i, getNewLetter(piece.file, -i)) in oppPosList:
+            downRight = False
+
+        # Check if we go too far down or to the left
+        # ' is the character that proceeds a in char values
+        if downLeft and piece.rank - i != 0 and getNewLetter(piece.file, -i) is not "`" and (piece.rank - i, getNewLetter(piece.file, -i)) not in myPosList:
+            # Check if hitting an opponent piece
+            if (piece.rank - i, getNewLetter(piece.file, -i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, -i)))
-                break
+                downLeft = False
             else:
                 myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, -i)))
+        else:
+            downLeft = False
+
     return myMoves
 
 
@@ -126,61 +132,53 @@ def getRookMove(piece, me, opp):
     myPosList = getPieceCoordList(me)
     oppPosList = getPieceCoordList(opp)
 
-    for i in range(1, 8):
-        if piece.rank + i == 9:
-            break
-        else:
-            # Collides with ally piece
-            if (piece.rank + i, piece.file) in myPosList:
-                break
-            # Hit enemy piece
-            elif (piece.rank + i, piece.file) in oppPosList:
-                myMoves.append(pieceMove(piece, piece.rank + i, piece.file))
-                break
-            else:
-                myMoves.append(pieceMove(piece, piece.rank + i, piece.file))
+    # Flags to indicate if the piece can continue to move in that direction
+    # Set to false if a boundary is hit or another piece is hit
+    up = True
+    down = True
+    right = True
+    left = True
 
     for i in range(1, 8):
-        if piece.rank - i == 0:
-            break
-        else:
-            # Collides with ally piece
-            if (piece.rank - i, piece.file) in myPosList:
-                break
+        if up and piece.rank + i != 9 and (piece.rank + i, piece.file) not in myPosList:
             # Hit enemy piece
-            elif (piece.rank - i, piece.file) in oppPosList:
+            if (piece.rank + i, piece.file) in oppPosList:
+                myMoves.append(pieceMove(piece, piece.rank + i, piece.file))
+                up = False
+            else:
+                myMoves.append(pieceMove(piece, piece.rank + i, piece.file))
+        else:
+            up = False
+
+        if down and piece.rank - i != 0 and (piece.rank - i, piece.file) not in myPosList:
+            # Hit enemy piece
+            if (piece.rank - i, piece.file) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank - i, piece.file))
-                break
+                down = False
             else:
                 myMoves.append(pieceMove(piece, piece.rank - i, piece.file))
-
-    for i in range(1, 8):
-        if getNewLetter(piece.file, i) is "i":
-            break
         else:
-            # Collides with ally piece
-            if (piece.rank, getNewLetter(piece.file, i)) in myPosList:
-                break
-            # Hit enemy piece
-            elif (piece.rank, getNewLetter(piece.file, i)) in oppPosList:
+            down = False
+
+        if right and getNewLetter(piece.file, i) is not "i" and (piece.rank, getNewLetter(piece.file, i)) not in myPosList:
+            if (piece.rank, getNewLetter(piece.file, i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, i)))
-                break
+                right = False
             else:
                 myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, i)))
-
-    for i in range(1, 8):
-        if getNewLetter(piece.file, -i) is "`":
-            break
         else:
-            # Collides with ally piece
-            if (piece.rank, getNewLetter(piece.file, -i)) in myPosList:
-                break
+            right = False
+
+        if left and getNewLetter(piece.file, -i) is not "`" and (piece.rank, getNewLetter(piece.file, -i)) not in myPosList:
             # Hit enemy piece
-            elif (piece.rank, getNewLetter(piece.file, -i)) in oppPosList:
+            if (piece.rank, getNewLetter(piece.file, -i)) in oppPosList:
                 myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, -i)))
-                break
+                left = False
             else:
                 myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, -i)))
+        else:
+            left = False
+
     return myMoves
 
 
