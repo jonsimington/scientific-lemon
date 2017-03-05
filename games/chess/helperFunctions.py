@@ -1,78 +1,86 @@
 from copy import deepcopy
 
+
 def getNewLetter(file, increment):
+    """
+    Finds the next letter character used for incrementing file
+    :param file: Current file of a piece [a-h]
+    :param increment: Positive or negative integer
+    :return: Character that is incremented by new letter
+             Can return any value is not limited to [a-h]
+    """
     return chr(ord(file) + increment)
 
 
 def getPieceCoordList(player):
+    """
+    Returns a list of rank, file of all pieces for a given player
+    :param player: Player or myPlayer class
+    :return: A list with tuples of form (rank, file)
+    """
     pieceCoordList = []
     for piece in player.pieces:
         pieceCoordList.append((piece.rank, piece.file))
 
     return pieceCoordList
 
+
 def isSquareOccupied(rank, file, allPieces):
+    """
+    Checks is a square has a piece in it
+    :param rank: Rank to check
+    :param file: File to check
+    :param allPieces: List of pieces to check
+    :return: True if rank and file are found in all pieces False if not
+    """
     for p in allPieces:
         if p.rank == rank and p.file == file:
             return True
     return False
 
+
 def getRealPiece(piece, player):
-    for p in player.pieces:
-        if p.rank == piece.rank and p.file == piece.file:
-            return p
+    """
+    Used for getting the MegaMiner AI Piece object for calling the move function
+    :param piece: myPiece object that a match is to be found for
+    :param player: MegaMiner AI Player class who owns the piece
+    :return: The matching piece in the pieceList
+    """
+    return getPieceFromList(piece, player.pieces)
 
 
 def getPieceFromList(piece, pieceList):
+    """
+        Used for getting a specified Piece object from a Piece list
+        Used for the interchange of pieces between myPlayer and Player classes
+        :param piece: myPiece object that a match is to be found for
+        :param pieceList: List of all pieces to find
+        :return: The matching piece in the pieceList
+    """
     for p in pieceList:
         if p.rank == piece.rank and p.file == piece.file:
             return p
 
 
 def getRankDirection(color):
+    """
+    Returns integer value specifying which way the rank moves for a color
+    :param color: White or Black
+    :return: 1 or -1 based on color
+    """
     if color == "White":
         return 1
     else:
         return -1
 
 
-def generateFen(myGame, move, currPlayerColor):
-    fen = ""
-    allPieces = getPieceListAfterMove(myGame.whitePlayer.pieces + myGame.blackPlayer.pieces, move)
-
-    blankSpace = 0
-
-    for rank in range(8,0,-1):
-        # Used for letters
-        for file in range(ord("a"),ord("i")):
-            piece = getPieceInSquare(rank, chr(file), allPieces)
-
-            if piece is not None:
-                if blankSpace > 0:
-                    fen += str(blankSpace)
-                    blankSpace = 0
-                fen += getLetterForColor(piece.type, piece.color)
-
-            else:
-                blankSpace += 1
-
-        if blankSpace > 0:
-            fen += str(blankSpace)
-            blankSpace = 0
-
-        fen += "/"
-    fen += " "
-    fen += getOppositeColorChar(currPlayerColor)
-    fen += getKingQueenCastleStr(move, myGame)
-
-    if currPlayerColor == "White":
-        fen += getPassantStr(myGame, move, 1)
-    else:
-        fen += getPassantStr(myGame, move, -1)
-
-    return fen
-
 def getPieceListAfterMove(pieceList, move):
+    """
+    Updated list of pieces after a move is made
+    :param pieceList: A list of pieces for both players
+    :param move: A pieceMove object that was made
+    :return: Updated list, with any captured pieces removed
+    """
     allPieces = deepcopy(pieceList)
     piece = getPieceFromList(move.piece, allPieces)
 
@@ -89,82 +97,26 @@ def getPieceListAfterMove(pieceList, move):
     return allPieces
 
 
-
-def getKingQueenCastleStr(move, myGame):
-    fen = " "
-
-    if not myGame.whitePlayer.canKingCastle or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 1):
-        fen += "-"
-    else:
-        fen += "K"
-
-    if not myGame.whitePlayer.canQueenCastle or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 1):
-         fen += "-"
-    else:
-        fen += "Q"
-
-    if not myGame.blackPlayer.canKingCastle or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 8):
-        fen += "-"
-    else:
-        fen += "k"
-
-    if not myGame.blackPlayer.canQueenCastle or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 8):
-        fen += "-"
-    else:
-        fen += "q"
-
-    return fen
-
-def getPassantStr(myGame,move, rankDirection):
-    fen = " "
-    if move.piece.type == "Pawn" and ((move.piece.rank == 7 and move.piece.color == "Black") or (move.piece.rank == 2 and move.piece.color == "White")) and (move.piece.rank + rankDirection * 2) == move.rank:
-        fen += (move.file  + str(move.rank - rankDirection))
-    else:
-        fen += "-"
-    return fen
-
-def getPieceInSquare(rank,file,allPieces):
+def getPieceInSquare(rank, file, allPieces):
+    """
+    Gets the piece located at a specific rank and file
+    :param rank: The rank of the piece
+    :param file: The file of the piece
+    :param allPieces: List of all pieces to look for
+    :return: Returns a piece if found or None if there is no piece at that location
+    """
     for p in allPieces:
         if p.rank == rank and p.file == file:
             return p
     return None
 
-def getOppositeColorChar(color):
-    if color == "White":
-        return "b"
-    else:
-        return "w"
 
 def findKing(pieces):
+    """
+    Return of the king
+    :param pieces: List of pieces for a single player
+    :return: The king is returned
+    """
     for p in pieces:
         if p.type == "King":
             return p
-
-
-def getLetterForColor(type, color):
-    if type == "Pawn" and color == "White":
-        return "P"
-    elif type == "Pawn" and color == "Black":
-        return "p"
-    elif type == "Rook" and color == "White":
-        return "R"
-    elif type == "Rook" and color == "Black":
-        return "r"
-    elif type == "Knight" and color == "White":
-        return "N"
-    elif type == "Knight" and color == "Black":
-        return "n"
-    elif type == "Bishop" and color == "White":
-        return "B"
-    elif type == "Bishop" and color == "Black":
-        return "b"
-    elif type == "Queen" and color == "White":
-        return "Q"
-    elif type == "Queen" and color == "Black":
-        return "q"
-    elif type == "King" and color == "White":
-        return "K"
-    elif type == "King" and color == "Black":
-        return "k"
-
-

@@ -1,7 +1,7 @@
 # This is where you build your AI for the Chess game.
-
 from joueur.base_ai import BaseAI
 from games.chess.generateMoves import *
+from games.chess.fenHelper import generateFen
 import random
 
 
@@ -61,34 +61,36 @@ class AI(BaseAI):
             print("Opponent's Last Move: '" + self.game.moves[-1].san + "'")
 
         # print how much time remaining this AI has to calculate moves
-        print("Time Remaining: " + str(self.player.time_remaining) + " ns")
+        # print("Time Remaining: " + str(self.player.time_remaining) + " ns")
 
-        # calculate my move
-
+        # Generate a game state
         myGame = gameState(self.game.fen)
 
+        # List of all possible moves
         moveList = getMove(myGame, self.player.color)
-
-        validMoves = [x for x in moveList if x != []]
+        # Final list of possible moves
         finalMoves = []
 
-
-        for move in validMoves:
+        # Check if any moves put the player in check
+        for move in moveList:
+            # Creates a FEN based on the move made
             newFen = generateFen(myGame, move, self.player.color)
             if not checkIfInCheck(newFen, self.player.color):
                 finalMoves.append(move)
 
-
+        # Select a random move
         moveToMake = random.choice(finalMoves)
-        # Prints moves that the piece that moves could make
 
+        # Prints moves that the piece that moves could make
         for moves in finalMoves:
             if moves.piece == moveToMake.piece:
                 print(moves.piece.type + " (" + moves.piece.file + str(
                     moves.piece.rank) + ")" + " to " + "(" + moves.file + str(moves.rank) + ")")
 
+        # Gets the Megaminer piece that is equivalent to my piece
         piece = getRealPiece(moveToMake.piece, self.player)
 
+        # Make the piece move
         piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
 
         return True  # to signify we are done with our turn.
