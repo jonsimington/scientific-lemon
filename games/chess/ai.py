@@ -75,7 +75,6 @@ class AI(BaseAI):
 
         for move in validMoves:
             newFen = generateFen(myGame, move, self.player.color)
-            print(newFen)
             if not checkIfInCheck(newFen, self.player.color):
                 finalMoves.append(move)
 

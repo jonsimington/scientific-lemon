@@ -93,25 +93,25 @@ def getPieceListAfterMove(pieceList, move):
 def getKingQueenCastleStr(move, myGame):
     fen = " "
 
-    if myGame.whitePlayer.canKingCastle and move.piece.type != "Rook" and move.piece.file != "h":
+    if not myGame.whitePlayer.canKingCastle or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 1):
+        fen += "-"
+    else:
         fen += "K"
-    else:
-        fen += "-"
 
-    if myGame.whitePlayer.canQueenCastle and move.piece.type != "Rook" and move.piece.file != "a":
+    if not myGame.whitePlayer.canQueenCastle or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 1):
+         fen += "-"
+    else:
         fen += "Q"
-    else:
-        fen += "-"
 
-    if myGame.blackPlayer.canKingCastle and move.piece.type != "Rook" and move.piece.file != "h":
+    if not myGame.blackPlayer.canKingCastle or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 8):
+        fen += "-"
+    else:
         fen += "k"
-    else:
-        fen += "-"
 
-    if myGame.blackPlayer.canQueenCastle and move.piece.type != "Rook" and move.piece.file != "a":
-        fen += "q"
-    else:
+    if not myGame.blackPlayer.canQueenCastle or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 8):
         fen += "-"
+    else:
+        fen += "q"
 
     return fen
 

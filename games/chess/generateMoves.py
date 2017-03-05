@@ -55,8 +55,7 @@ def getMove(myGame, colorToMove):
         else:
             result = getKingMove(p, player, opponent)
             for moves in result:
-                if not isSquareAttacked(player, opponent, moves.rank, moves.file):
-                    moveList.append(moves)
+                moveList.append(moves)
 
     # Removes empty list that may be returned if not valid moves were found
 
