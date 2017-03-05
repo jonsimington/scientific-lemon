@@ -57,6 +57,10 @@ def getMove(myGame, colorToMove):
             for moves in result:
                 moveList.append(moves)
 
+            castleMove = getCastleMoves(p, player, opponent)
+            for move in castleMove:
+                moveList.append(move)
+
     # Removes empty list that may be returned if not valid moves were found
 
     return moveList
@@ -256,7 +260,6 @@ def getQueenMove(piece, me, opp):
 
 def getKingMove(piece, me, opp):
     myPosList = getPieceCoordList(me)
-    oppList = getPieceCoordList(opp)
 
     possiblePosList = []
     finalResult = []
@@ -276,37 +279,31 @@ def getKingMove(piece, me, opp):
             finalResult.append(move)
 
 
-    castleMove = getCastleMoves(me, opp, piece, myPosList, oppList )
-    for move in castleMove:
-        finalResult.append(move)
-
     return finalResult
 
 
-def getCastleMoves(me, opp, piece, myPosList, oppList):
+def getCastleMoves(piece, me, opp):
     movesToMake = []
-    # Check that King has not moved
 
+    myPosList = getPieceCoordList(me)
+    oppList = getPieceCoordList(opp)
 
-    kingRook = me.canKingCastle
-    queenRook = me.canQueenCastle
-
-    if kingRook:
+    if me.canKingCastle:
         kingSideMove = pieceMove(piece, piece.rank, "h")
         movesToMake.append(kingSideMove)
         # Check King is not blocked
         for i in range(1, 3):
-            if (piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList):
+            if ((piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList)) or (isSquareAttacked(me, opp, piece.rank, getNewLetter(piece.file, i))):
                 movesToMake.remove(kingSideMove)
                 break
 
-    if queenRook:
+    if me.canQueenCastle:
         queenSideMove = pieceMove(piece, piece.rank, "a")
         movesToMake.append(queenSideMove)
 
         # Check Queen is not blocked
         for i in range(1, 4):
-            if (piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList):
+            if ((piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList)) or (isSquareAttacked(me, opp, piece.rank, getNewLetter(piece.file, -i))):
                 movesToMake.remove(queenSideMove)
                 break
 
