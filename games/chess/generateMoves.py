@@ -31,7 +31,7 @@ def getMove(fen, colorToMove):
 
     for p in pieces:
         if p.type == "Pawn":
-            result = (getPawnMove(p, player, opponent))
+            result = getPawnMove(p, player, opponent, myGame.enPassantTarget)
             for moves in result:
                 moveList.append(moves)
 
@@ -72,15 +72,21 @@ def getMove(fen, colorToMove):
 
 
 
-def getPawnMove(piece, me, opp):
+def getPawnMove(piece, me, opp, passant):
     myMoves = []
 
-    forwardMove = pieceMove(piece, piece.rank + me.rank_direction, piece.file)
-    doubleForwardMove = pieceMove(piece, piece.rank + me.rank_direction * 2, piece.file)
+    # Default these moves to None
+    forwardMove = False
 
     # Can move forward
-    if isSquareOccupied(piece.rank + me.rank_direction, piece.file, (me.pieces + opp.pieces)):
-        forwardMove = None
+    if not isSquareOccupied(piece.rank + me.rank_direction, piece.file, (me.pieces + opp.pieces)):
+        forwardMove = True
+        myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, piece.file))
+
+    # Can I double move for first move
+    if forwardMove and ((piece.rank == 2 and me.color == "White") or (piece.rank == 7 and me.color == "Black")) and not isSquareOccupied(piece.rank + me.rank_direction * 2, piece.file, (me.pieces + opp.pieces)):
+        myMoves.append(pieceMove(piece, piece.rank + me.rank_direction * 2, piece.file))
+
 
     # Can attack diagonal
     for p in opp.pieces:
@@ -89,19 +95,16 @@ def getPawnMove(piece, me, opp):
         if piece.rank + me.rank_direction == p.rank and getNewLetter(piece.file, -1) == p.file:
             myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, -1)))
 
-    # Pawn has not moved from base location
-    # And the position immeidately front of the pawn is not blocked
-    if forwardMove is not None and  ( (piece.rank == 2 and me.color == "White") or (piece.rank == 7 and me.color == "Black")):
-        if isSquareOccupied(piece.rank + me.rank_direction * 2, piece.file, (me.pieces + opp.pieces)):
-            doubleForwardMove = None
-    else:
-        doubleForwardMove = None
+    # Can attack En Passant
+    if passant != "-":
+        leftPass = getNewLetter(piece.file, -1) + str(piece.rank + me.rank_direction)
+        rightPass = getNewLetter(piece.file, 1) + str(piece.rank + me.rank_direction)
 
-    if forwardMove is not None:
-        myMoves.append(forwardMove)
+        if passant == leftPass:
+            myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, -1) ))
 
-    if doubleForwardMove is not None:
-        myMoves.append(doubleForwardMove)
+        elif passant == rightPass:
+            myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, 1)))
 
     for move in myMoves:
         if move.rank == 1 or move.rank == 8:
@@ -318,12 +321,12 @@ def getCastleMoves(me, opp, piece, myPosList, oppList):
 
     return movesToMake
 
-def isSquareAttacked(player, opp, rank, file):
+def isSquareAttacked(player, opp, rank, file, passant=""):
     moveList = []
 
     for p in player.pieces:
         if p.type == "Pawn":
-            result = (getPawnMove(p, player, opp))
+            result = (getPawnMove(p, player, opp, passant))
             for moves in result:
                 moveList.append(moves)
 
