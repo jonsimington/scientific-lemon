@@ -66,6 +66,7 @@ class AI(BaseAI):
         # calculate my move
         moveList = []
         pieces = self.player.pieces
+        kingCoords = None
         for p in pieces:
             if p.type == "Pawn":
                 result = (getPawnMove(p, self.player, self.player.opponent))
@@ -93,7 +94,8 @@ class AI(BaseAI):
             else:
                 result = getKingMove(p, self.player, self.player.opponent)
                 for moves in result:
-                    moveList.append(moves)
+                    if not isSquareAttacked(self.player, self.player.opponent, moves.rank, moves.file):
+                        moveList.append(moves)
 
         # Removes empty list that may be returned if not valid moves were found
         validMoves = [x for x in moveList if x != []]

@@ -237,54 +237,88 @@ def getKingMove(piece, me, opp):
         if 1 <= rank <= 8 and ord("a") <= ord(file) <= ord("h") and (rank, file) not in myPosList:
             finalResult.append(move)
 
-    # Check that King has not moved
-    if piece.has_moved is False and piece.file == "e" and (
-                (piece.rank == 1 and piece.owner.color == "White") or (
-                            piece.rank == 8 and piece.owner.color == "Black")):
 
+    castleMove = getCastleMoves(me, opp, piece, myPosList, oppList )
+    for move in castleMove:
+        finalResult.append(move)
+
+    return finalResult
+
+
+def getCastleMoves(me, opp, piece, myPosList, oppList):
+    movesToMake = []
+    # Check that King has not moved
+    if piece.has_moved is False and piece.file == "e" and ( (piece.rank == 1 and piece.owner.color == "White") or ( piece.rank == 8 and piece.owner.color == "Black")):
         kingRook = False
         queenRook = False
 
         # Check if the rooks still exist and meet conditions for castling
         for p in me.pieces:
-            if p.has_moved is False and p.type == "Rook" and p.file == "h" and (
-                        (p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
-
+            if p.has_moved is False and p.type == "Rook" and p.file == "h" and ( (p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
                 kingRook = True
 
-            elif p.has_moved is False and p.type == "Rook" and p.file == "a" and (
-                        (p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
+            elif p.has_moved is False and p.type == "Rook" and p.file == "a" and ((p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
                 queenRook = True
+
 
         if kingRook:
             kingSideMove = pieceMove(piece, piece.rank, "h")
-            finalResult.append(kingSideMove)
+            movesToMake.append(kingSideMove)
             # Check King is not blocked
             for i in range(1, 3):
-                if (piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList) or isSquareAttacked(opp,
-                                                                                                          piece.rank,
-                                                                                                          getNewLetter(
-                                                                                                              piece.file,
-                                                                                                              i)):
-                    finalResult.remove(kingSideMove)
+                if (piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList):
+                    movesToMake.remove(kingSideMove)
                     break
 
         if queenRook:
             queenSideMove = pieceMove(piece, piece.rank, "a")
-            finalResult.append(queenSideMove)
+            movesToMake.append(queenSideMove)
 
             # Check Queen is not blocked
             for i in range(1, 4):
-                if (piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList) or isSquareAttacked(opp,
-                                                                                                           piece.rank,
-                                                                                                           getNewLetter(
-                                                                                                               piece.file,
-                                                                                                               i)):
-                    finalResult.remove(queenSideMove)
+                if (piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList):
+                    movesToMake.remove(queenSideMove)
                     break
 
-    return finalResult
+    return movesToMake
 
+def isSquareAttacked(player, opp, rank, file):
+    moveList = []
 
-def isSquareAttacked(opp, rank, file):
+    for p in player.pieces:
+        if p.type == "Pawn":
+            result = (getPawnMove(p, player, opp))
+            for moves in result:
+                moveList.append(moves)
+
+        elif p.type == "Bishop":
+            result = getBishopMove(p, player, opp)
+            for moves in result:
+                moveList.append(moves)
+
+        elif p.type == "Rook":
+            result = getRookMove(p, player, opp)
+            for moves in result:
+                moveList.append(moves)
+        elif p.type == "Knight":
+            result = getKnightMove(p, player, opp)
+            for moves in result:
+                moveList.append(moves)
+        elif p.type == "Queen":
+            result = getQueenMove(p, player, opp)
+            for moves in result:
+                moveList.append(moves)
+        # King
+        else:
+            result = getKingMove(p, player, opp)
+            for moves in result:
+                moveList.append(moves)
+
+                # Removes empty list that may be returned if not valid moves were found
+    validMoves = [x for x in moveList if x != []]
+
+    for move in validMoves:
+        if move.rank == rank and move.file == file:
+            return True
+
     return False
