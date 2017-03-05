@@ -2,8 +2,8 @@ from games.chess.helperFunctions import  *
 
 class gameState:
     def __init__(self,fen):
-        self.player1 = myPlayer("White", fen)
-        self.player2 = myPlayer("Black", fen)
+        self.whitePlayer = myPlayer("White", fen)
+        self.blackPlayer = myPlayer("Black", fen)
         self.enPassantTarget = self.getPassantTarget(fen)
         self.fen = fen
 
@@ -40,22 +40,22 @@ class myPlayer:
                 file = getNewLetter(file, int(letter))
             else:
                 if (letter == "P" and color == "White") or (letter == "p" and color == "Black"):
-                    myPieces.append(myPiece(file, rank, "Pawn"))
+                    myPieces.append(myPiece(file, rank, "Pawn", color))
 
                 elif (letter == "R" and color == "White") or (letter == "r" and color == "Black"):
-                    myPieces.append(myPiece(file, rank, "Rook"))
+                    myPieces.append(myPiece(file, rank, "Rook",color))
 
                 elif (letter == "N" and color == "White") or (letter == "n" and color == "Black"):
-                    myPieces.append(myPiece(file, rank, "Knight"))
+                    myPieces.append(myPiece(file, rank, "Knight", color))
 
                 elif (letter == "B" and color == "White") or (letter == "b" and color == "Black"):
-                    myPieces.append(myPiece(file, rank, "Bishop"))
+                    myPieces.append(myPiece(file, rank, "Bishop",color))
 
                 elif (letter == "Q" and color == "White") or (letter == "q" and color == "Black"):
-                    myPieces.append(myPiece(file, rank, "Queen"))
+                    myPieces.append(myPiece(file, rank, "Queen",color))
 
                 elif (letter == "K" and color == "White") or (letter == "k" and color == "Black"):
-                    myPieces.append(myPiece(file, rank, "King"))
+                    myPieces.append(myPiece(file, rank, "King",color))
 
                 file = getNewLetter(file, 1)
         self.pieces = myPieces
@@ -81,10 +81,11 @@ class myPlayer:
         print()
 
 class myPiece:
-    def __init__(self, file, rank, type):
+    def __init__(self, file, rank, type, color):
             self.file = file
             self.rank = rank
             self.type = type
+            self.color = color
 
 
 def getGameState(fen):

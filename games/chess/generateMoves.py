@@ -14,20 +14,19 @@ class pieceMove:
 
 
 
-def getMove(fen, colorToMove):
-    myGame = gameState(fen)
+def getMove(myGame, colorToMove):
 
     moveList = []
 
     if colorToMove == "White":
-        pieces = myGame.player1.pieces
-        player = myGame.player1
-        opponent = myGame.player2
+        pieces = myGame.whitePlayer.pieces
+        player = myGame.whitePlayer
+        opponent = myGame.blackPlayer
 
     else:
-        pieces = myGame.player2.pieces
-        player = myGame.player2
-        opponent = myGame.player1
+        pieces = myGame.blackPlayer.pieces
+        player = myGame.blackPlayer
+        opponent = myGame.whitePlayer
 
     for p in pieces:
         if p.type == "Pawn":
@@ -60,15 +59,8 @@ def getMove(fen, colorToMove):
                     moveList.append(moves)
 
     # Removes empty list that may be returned if not valid moves were found
-    validMoves = [x for x in moveList if x != []]
-    moveToMake = random.choice(validMoves)
-    # Prints moves that the piece that moves could make
-    for moves in validMoves:
-        if moves.piece == moveToMake.piece:
-            print(moves.piece.type + " (" + moves.piece.file + str(
-                moves.piece.rank) + ")" + " to " + "(" + moves.file + str(moves.rank) + ")")
 
-    return moveToMake
+    return moveList
 
 
 
@@ -361,3 +353,17 @@ def isSquareAttacked(player, opp, rank, file, passant=""):
             return True
 
     return False
+
+def checkIfInCheck(fen, color):
+    myGame = gameState(fen)
+    if color == "White":
+        me = myGame.whitePlayer
+        opp = myGame.blackPlayer
+    else:
+        me = myGame.blackPlayer
+        opp = myGame.whitePlayer
+
+    king = findKing(me.pieces)
+
+    return isSquareAttacked(opp, me, king.rank, king.file)
+

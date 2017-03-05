@@ -64,7 +64,29 @@ class AI(BaseAI):
         print("Time Remaining: " + str(self.player.time_remaining) + " ns")
 
         # calculate my move
-        moveToMake = getMove(self.game.fen, self.player.color)
+
+        myGame = gameState(self.game.fen)
+
+        moveList = getMove(myGame, self.player.color)
+
+        validMoves = [x for x in moveList if x != []]
+        finalMoves = []
+
+
+        for move in validMoves:
+            newFen = generateFen(myGame, move, self.player.color)
+            print(newFen)
+            if not checkIfInCheck(newFen, self.player.color):
+                finalMoves.append(move)
+
+
+        moveToMake = random.choice(finalMoves)
+        # Prints moves that the piece that moves could make
+
+        for moves in finalMoves:
+            if moves.piece == moveToMake.piece:
+                print(moves.piece.type + " (" + moves.piece.file + str(
+                    moves.piece.rank) + ")" + " to " + "(" + moves.file + str(moves.rank) + ")")
 
         piece = getRealPiece(moveToMake.piece, self.player)
 
