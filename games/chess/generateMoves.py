@@ -1,5 +1,6 @@
 import random
-
+from games.chess.helperFunctions import *
+from games.chess.gameState import *
 
 class pieceMove:
     def __init__(self, piece, rank, file, promotion=""):
@@ -12,16 +13,63 @@ class pieceMove:
         print(self.piece.type, self.rank, self.file, sep="\t")
 
 
-def getNewLetter(file, increment):
-    return chr(ord(file) + increment)
 
+def getMove(fen, colorToMove):
+    myGame = gameState(fen)
 
-def getPieceCoordList(player):
-    pieceCoordList = []
-    for piece in player.pieces:
-        pieceCoordList.append((piece.rank, piece.file))
+    moveList = []
 
-    return pieceCoordList
+    if colorToMove == "White":
+        pieces = myGame.player1.pieces
+        player = myGame.player1
+        opponent = myGame.player2
+
+    else:
+        pieces = myGame.player2.pieces
+        player = myGame.player2
+        opponent = myGame.player1
+
+    for p in pieces:
+        if p.type == "Pawn":
+            result = (getPawnMove(p, player, opponent))
+            for moves in result:
+                moveList.append(moves)
+
+        elif p.type == "Bishop":
+            result = getBishopMove(p, player, opponent)
+            for moves in result:
+                moveList.append(moves)
+
+        elif p.type == "Rook":
+            result = getRookMove(p, player, opponent)
+            for moves in result:
+                moveList.append(moves)
+        elif p.type == "Knight":
+            result = getKnightMove(p, player, opponent)
+            for moves in result:
+                moveList.append(moves)
+        elif p.type == "Queen":
+            result = getQueenMove(p, player, opponent)
+            for moves in result:
+                moveList.append(moves)
+        # King
+        else:
+            result = getKingMove(p, player, opponent)
+            for moves in result:
+                if not isSquareAttacked(player, opponent, moves.rank, moves.file):
+                    moveList.append(moves)
+
+    # Removes empty list that may be returned if not valid moves were found
+    validMoves = [x for x in moveList if x != []]
+    moveToMake = random.choice(validMoves)
+    # Prints moves that the piece that moves could make
+    for moves in validMoves:
+        if moves.piece == moveToMake.piece:
+            print(moves.piece.type + " (" + moves.piece.file + str(
+                moves.piece.rank) + ")" + " to " + "(" + moves.file + str(moves.rank) + ")")
+
+    return moveToMake
+
 
 
 def getPawnMove(piece, me, opp):
@@ -30,11 +78,11 @@ def getPawnMove(piece, me, opp):
     forwardMove = pieceMove(piece, piece.rank + me.rank_direction, piece.file)
     doubleForwardMove = pieceMove(piece, piece.rank + me.rank_direction * 2, piece.file)
 
-    for p in me.pieces + opp.pieces:
-        if piece.rank + me.rank_direction == p.rank and piece.file is p.file:
-            forwardMove = None
-            break
+    # Can move forward
+    if isSquareOccupied(piece.rank + me.rank_direction, piece.file, (me.pieces + opp.pieces)):
+        forwardMove = None
 
+    # Can attack diagonal
     for p in opp.pieces:
         if piece.rank + me.rank_direction == p.rank and getNewLetter(piece.file, 1) == p.file:
             myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, 1)))
@@ -43,13 +91,9 @@ def getPawnMove(piece, me, opp):
 
     # Pawn has not moved from base location
     # And the position immeidately front of the pawn is not blocked
-    if not piece.has_moved and forwardMove is not None and (
-                (piece.rank == 1 and piece.owner.color == "White") or (
-                            piece.rank == 8 and piece.owner.color == "Black")):
-        for p in me.pieces + opp.pieces:
-            if piece.rank + (me.rank_direction * 2) == p.rank and piece.file is p.file:
-                doubleForwardMove = None
-                break
+    if forwardMove is not None and  ( (piece.rank == 2 and me.color == "White") or (piece.rank == 7 and me.color == "Black")):
+        if isSquareOccupied(piece.rank + me.rank_direction * 2, piece.file, (me.pieces + opp.pieces)):
+            doubleForwardMove = None
     else:
         doubleForwardMove = None
 
@@ -248,37 +292,29 @@ def getKingMove(piece, me, opp):
 def getCastleMoves(me, opp, piece, myPosList, oppList):
     movesToMake = []
     # Check that King has not moved
-    if piece.has_moved is False and piece.file == "e" and ( (piece.rank == 1 and piece.owner.color == "White") or ( piece.rank == 8 and piece.owner.color == "Black")):
-        kingRook = False
-        queenRook = False
-
-        # Check if the rooks still exist and meet conditions for castling
-        for p in me.pieces:
-            if p.has_moved is False and p.type == "Rook" and p.file == "h" and ( (p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
-                kingRook = True
-
-            elif p.has_moved is False and p.type == "Rook" and p.file == "a" and ((p.rank == 1 and p.owner.color == "White") or (p.rank == 8 and p.owner.color == "Black")):
-                queenRook = True
 
 
-        if kingRook:
-            kingSideMove = pieceMove(piece, piece.rank, "h")
-            movesToMake.append(kingSideMove)
-            # Check King is not blocked
-            for i in range(1, 3):
-                if (piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList):
-                    movesToMake.remove(kingSideMove)
-                    break
+    kingRook = me.canKingCastle
+    queenRook = me.canQueenCastle
 
-        if queenRook:
-            queenSideMove = pieceMove(piece, piece.rank, "a")
-            movesToMake.append(queenSideMove)
+    if kingRook:
+        kingSideMove = pieceMove(piece, piece.rank, "h")
+        movesToMake.append(kingSideMove)
+        # Check King is not blocked
+        for i in range(1, 3):
+            if (piece.rank, getNewLetter(piece.file, i)) in (myPosList + oppList):
+                movesToMake.remove(kingSideMove)
+                break
 
-            # Check Queen is not blocked
-            for i in range(1, 4):
-                if (piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList):
-                    movesToMake.remove(queenSideMove)
-                    break
+    if queenRook:
+        queenSideMove = pieceMove(piece, piece.rank, "a")
+        movesToMake.append(queenSideMove)
+
+        # Check Queen is not blocked
+        for i in range(1, 4):
+            if (piece.rank, getNewLetter(piece.file, -i)) in (myPosList + oppList):
+                movesToMake.remove(queenSideMove)
+                break
 
     return movesToMake
 
