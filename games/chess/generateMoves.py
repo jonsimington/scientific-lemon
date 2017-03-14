@@ -123,12 +123,28 @@ def getPawnMove(piece, me, opp, passant):
         elif passant == rightPass:
             myMoves.append(pieceMove(piece, piece.rank + me.rank_direction, getNewLetter(piece.file, 1)))
 
+    finalMoves = []
     # Adds promotion tag as necessary
     for move in myMoves:
         if move.rank == 1 or move.rank == 8:
-            move.promotion = random.choice(["Queen", "Rook", "Bishop", "Knight"])
+            qProm = deepcopy(move)
+            qProm.promotion = "Queen"
+            finalMoves.append(qProm)
 
-    return myMoves
+            rProm = deepcopy(move)
+            rProm.promotion = "Rook"
+            finalMoves.append(rProm)
+
+            bProm = deepcopy(move)
+            bProm.promotion = "Bishop"
+            finalMoves.append(bProm)
+
+            move.promotion = "Knight"
+            finalMoves.append(move)
+        else:
+            finalMoves.append(move)
+
+    return finalMoves
 
 
 def getBishopMove(piece, me, opp):

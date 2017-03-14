@@ -14,8 +14,8 @@ class myPlayer:
         self.canKingCastle = False
         self.myMove = False
         self.pieces = []
-
         self.color = color
+        self.score = self.calculateScore()
         self.rank_direction = getRankDirection(color)
 
         # Gets data from Fen and inserts into member variables
@@ -44,6 +44,12 @@ class myPlayer:
             elif (letter == "Q" and color == "White") or (letter == "q" and color == "Black"):
                 self.canQueenCastle = True
 
+    def calculateScore(self):
+        score = 0
+        for p in self.pieces:
+            score += getPieceScore(p.type)
+        return score
+
     def printMe(self):
         """
         Prints color and all pieces player owns
@@ -53,3 +59,17 @@ class myPlayer:
         for p in self.pieces:
             print(p.type + ": " + p.file + str(p.rank))
         print()
+
+
+def getPieceScore(type):
+    if type == "Pawn":
+        return 1
+    elif type == "Knight" or type == "Bishop":
+        return 3
+    elif type == "Rook":
+        return 5
+    elif type == "Queen":
+        return 9
+    # King
+    else:
+        return 0
