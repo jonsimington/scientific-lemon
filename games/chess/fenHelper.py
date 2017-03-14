@@ -69,26 +69,34 @@ def getKingQueenCastleFen(move, myGame):
     """
 
     fen = " "
-    if not myGame.whitePlayer.canKingCastle or (
-                        move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 1):
+    if not myGame.whitePlayer.canKingCastle \
+            or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 1) \
+            or (move.piece.type == "King" and move.piece.file == "h"):
+
         fen += "-"
     else:
         fen += "K"
 
-    if not myGame.whitePlayer.canQueenCastle or (
-                        move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 1):
+    if not myGame.whitePlayer.canQueenCastle \
+            or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 1)\
+            or (move.piece.type == "King" and move.piece.file == "a"):
+
         fen += "-"
     else:
         fen += "Q"
 
-    if not myGame.blackPlayer.canKingCastle or (
-                        move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 8):
+    if not myGame.blackPlayer.canKingCastle \
+            or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 8)\
+            or (move.piece.type == "King" and move.piece.file == "h"):
+
         fen += "-"
     else:
         fen += "k"
 
-    if not myGame.blackPlayer.canQueenCastle or (
-                        move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 8):
+    if not myGame.blackPlayer.canQueenCastle \
+            or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 8)\
+            or (move.piece.type == "King" and move.piece.file == "a"):
+
         fen += "-"
     else:
         fen += "q"

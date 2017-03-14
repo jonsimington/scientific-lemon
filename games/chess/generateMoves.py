@@ -420,43 +420,45 @@ def isSquareAttacked(player, opp, rank, file, passant=""):
     :param passant: Passant flag for checking En Passant
     :return: Returns true if a piece can attack the square
     """
-    moveList = []
-
     for p in player.pieces:
         if p.type == "Pawn":
             result = (getPawnMove(p, player, opp, passant))
-            for moves in result:
-                moveList.append(moves)
+            for move in result:
+                if move.rank == rank and move.file == file:
+                    return True
+
 
         elif p.type == "Bishop":
             result = getBishopMove(p, player, opp)
-            for moves in result:
-                moveList.append(moves)
+            for move in result:
+                if move.rank == rank and move.file == file:
+                    return True
+
 
         elif p.type == "Rook":
             result = getRookMove(p, player, opp)
-            for moves in result:
-                moveList.append(moves)
+            for move in result:
+                if move.rank == rank and move.file == file:
+                    return True
+
         elif p.type == "Knight":
             result = getKnightMove(p, player, opp)
-            for moves in result:
-                moveList.append(moves)
+            for move in result:
+                if move.rank == rank and move.file == file:
+                    return True
+
         elif p.type == "Queen":
             result = getQueenMove(p, player, opp)
-            for moves in result:
-                moveList.append(moves)
+            for move in result:
+                if move.rank == rank and move.file == file:
+                    return True
+
         # King
         else:
             result = getKingMove(p, player, opp)
-            for moves in result:
-                moveList.append(moves)
-
-                # Removes empty list that may be returned if not valid moves were found
-    validMoves = [x for x in moveList if x != []]
-
-    for move in validMoves:
-        if move.rank == rank and move.file == file:
-            return True
+            for move in result:
+                if move.rank == rank and move.file == file:
+                    return True
 
     return False
 
