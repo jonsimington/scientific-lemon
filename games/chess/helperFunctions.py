@@ -92,6 +92,10 @@ def getPieceListAfterMove(pieceList, move):
 
     piece.rank = move.rank
     piece.file = move.file
+
+    if move.promotion != "":
+        piece.type = move.promotion
+
     allPieces.append(piece)
 
     return allPieces
