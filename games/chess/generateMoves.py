@@ -480,4 +480,8 @@ def checkIfInCheck(fen, color):
 
     king = findKing(me.pieces)
 
-    return isSquareAttacked(opp, me, king.rank, king.file)
+    # This is used to prevent trying to peer into a future state where the king is already captured
+    if king is None:
+        return True
+    else:
+        return isSquareAttacked(opp, me, king.rank, king.file)

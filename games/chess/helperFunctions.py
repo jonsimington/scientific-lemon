@@ -87,7 +87,6 @@ def getPieceListAfterMove(pieceList, move):
     allPieces.remove(piece)
     for p in allPieces:
         if move.rank == p.rank and move.file == p.file:
-
             # Check for King moving into its own rook for castling
             if p.type == "Rook" and p.color == move.piece.color:
                 # Update rooks position
@@ -97,14 +96,14 @@ def getPieceListAfterMove(pieceList, move):
                     p.file = "b"
 
             else:
-                allPieces.remove(p)
+               allPieces.remove(p)
 
             break
 
     piece.rank = move.rank
     piece.file = move.file
 
-    if move.promotion != "":
+    if move.promotion != "" and piece.type == "Pawn":
         piece.type = move.promotion
 
     allPieces.append(piece)

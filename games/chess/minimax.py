@@ -23,19 +23,27 @@ def minimaxMove(myGame, depth, playerMoveColor, myColor):
 
         # Validates no illegal moves are made
         if not checkIfInCheck(newFen, playerMoveColor):
-            score = getMinMove(newFen, depth - 1, playerMoveColor, myColor)
+            score = getMinMove(newFen, depth, playerMoveColor, myColor)
             validMoves.append(moveScore(move, score))
 
     # Best possible move
     bestMove = []
+
+    # Default the score to really low value
     currScore = -999
+    allScore = ""
     for move in validMoves:
-        if move.myScore > currScore:
-            bestMove= [move.myMove]
+        allScore += ", " + str(move.myScore)
+
+        if move.myScore is not None and move.myScore > currScore:
+            bestMove = [move.myMove]
             currScore = move.myScore
 
         elif move.myScore == currScore:
-            bestMove.append(move.myMove)
+                bestMove.append(move.myMove)
+
+    print("MINIMAX Score:    " + str(allScore))
+    print("MINIMAX RESULT:    " + str(currScore))
 
     return random.choice(bestMove)
 
@@ -69,10 +77,16 @@ def getMaxMove(fen, depth, playerMoveColor, myColor):
         # Best possible score
         currScore = -999
         for move in validMoves:
-            if move.myScore > currScore:
+            # Check that the move has a score, it will not if the game ends
+            if move.myScore is not None and move.myScore > currScore:
                 currScore = move.myScore
 
-        return currScore
+        # Default the score to really low value
+        if currScore == -999:
+            return None
+        else:
+            return currScore
+
 
 def getMinMove(fen, depth, playerMoveColor, myColor):
     myGame = gameState(fen)
@@ -102,9 +116,14 @@ def getMinMove(fen, depth, playerMoveColor, myColor):
                 validMoves.append(moveScore(move, score))
 
         # Best possible score
+        # Default the score to really largevalue
         currScore = 999
         for move in validMoves:
-            if move.myScore < currScore:
+            # Check that the move has a score, it will not if the game ends
+            if move.myScore is not None and move.myScore < currScore:
                 currScore = move.myScore
 
-        return currScore
+        if currScore == 999:
+            return None
+        else:
+            return currScore
