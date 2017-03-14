@@ -23,7 +23,7 @@ def minimaxMove(myGame, depth, playerMoveColor, myColor):
 
         # Validates no illegal moves are made
         if not checkIfInCheck(newFen, playerMoveColor):
-            score = getMinMove(newFen, depth, playerMoveColor, myColor)
+            score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor)
             validMoves.append(moveScore(move, score))
 
     # Best possible move
@@ -49,81 +49,88 @@ def minimaxMove(myGame, depth, playerMoveColor, myColor):
 
 
 def getMaxMove(fen, depth, playerMoveColor, myColor):
-    myGame = gameState(fen)
+    if "K" in fen and "k" in fen:
+        myGame = gameState(fen)
 
-    if depth <= 0:
-        if myColor == "Black":
-            return myGame.blackPlayer.score - myGame.whitePlayer.score
+        if depth <= 0:
+            if myColor == "Black":
+                return myGame.blackPlayer.score - myGame.whitePlayer.score
+            else:
+                return myGame.whitePlayer.score - myGame.blackPlayer.score
+
         else:
-            return myGame.whitePlayer.score - myGame.blackPlayer.score
+            # List of all possible moves
+            moveList = getMove(myGame, playerMoveColor)
 
+            # Final list of possible moves
+            validMoves= []
+
+            # Check if any moves put the player in check
+            for move in moveList:
+                # Creates a FEN based on the move made
+                newFen = generateFen(myGame, move, playerMoveColor)
+
+                # Validates no illegal moves are made
+                if not checkIfInCheck(newFen, playerMoveColor):
+                    score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor)
+                    validMoves.append(moveScore(move, score))
+
+            # Best possible score
+            currScore = -999
+            for move in validMoves:
+                # Check that the move has a score, it will not if the game ends
+                if move.myScore is not None and move.myScore > currScore:
+                    currScore = move.myScore
+
+            # Default the score to really low value
+            if currScore == -999:
+                return None
+            else:
+                return currScore
     else:
-        # List of all possible moves
-        moveList = getMove(myGame, playerMoveColor)
-
-        # Final list of possible moves
-        validMoves= []
-
-        # Check if any moves put the player in check
-        for move in moveList:
-            # Creates a FEN based on the move made
-            newFen = generateFen(myGame, move, playerMoveColor)
-
-            # Validates no illegal moves are made
-            if not checkIfInCheck(newFen, playerMoveColor):
-                score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor)
-                validMoves.append(moveScore(move, score))
-
-        # Best possible score
-        currScore = -999
-        for move in validMoves:
-            # Check that the move has a score, it will not if the game ends
-            if move.myScore is not None and move.myScore > currScore:
-                currScore = move.myScore
-
-        # Default the score to really low value
-        if currScore == -999:
-            return None
-        else:
-            return currScore
+        return None
 
 
 def getMinMove(fen, depth, playerMoveColor, myColor):
-    myGame = gameState(fen)
+    if "K" in fen and "k" in fen:
 
-    if depth <= 0:
-        if myColor == "Black":
-            return myGame.blackPlayer.score - myGame.whitePlayer.score
+        myGame = gameState(fen)
+
+        if depth <= 0:
+            if myColor == "Black":
+                return myGame.blackPlayer.score - myGame.whitePlayer.score
+            else:
+                return myGame.whitePlayer.score - myGame.blackPlayer.score
+
+
         else:
-            return myGame.whitePlayer.score - myGame.blackPlayer.score
+            # List of all possible moves
+            moveList = getMove(myGame, playerMoveColor)
 
+            # Final list of possible moves
+            validMoves= []
 
+            # Check if any moves put the player in check
+            for move in moveList:
+                # Creates a FEN based on the move made
+                newFen = generateFen(myGame, move, playerMoveColor)
+
+                # Validates no illegal moves are made
+                if not checkIfInCheck(newFen, playerMoveColor):
+                    score = getMaxMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor)
+                    validMoves.append(moveScore(move, score))
+
+            # Best possible score
+            # Default the score to really largevalue
+            currScore = 999
+            for move in validMoves:
+                # Check that the move has a score, it will not if the game ends
+                if move.myScore is not None and move.myScore < currScore:
+                    currScore = move.myScore
+
+            if currScore == 999:
+                return None
+            else:
+                return currScore
     else:
-        # List of all possible moves
-        moveList = getMove(myGame, playerMoveColor)
-
-        # Final list of possible moves
-        validMoves= []
-
-        # Check if any moves put the player in check
-        for move in moveList:
-            # Creates a FEN based on the move made
-            newFen = generateFen(myGame, move, playerMoveColor)
-
-            # Validates no illegal moves are made
-            if not checkIfInCheck(newFen, playerMoveColor):
-                score = getMaxMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor)
-                validMoves.append(moveScore(move, score))
-
-        # Best possible score
-        # Default the score to really largevalue
-        currScore = 999
-        for move in validMoves:
-            # Check that the move has a score, it will not if the game ends
-            if move.myScore is not None and move.myScore < currScore:
-                currScore = move.myScore
-
-        if currScore == 999:
-            return None
-        else:
-            return currScore
+        return None
