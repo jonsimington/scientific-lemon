@@ -14,12 +14,13 @@ class myPlayer:
         self.canKingCastle = False
         self.myMove = False
         self.pieces = []
+        self.score = 0
         self.color = color
-        self.score = self.calculateScore()
         self.rank_direction = getRankDirection(color)
 
         # Gets data from Fen and inserts into member variables
         self.parseFen(fen, color)
+        self.calculateScore()
 
     def parseFen(self, fen, color):
         """
@@ -48,7 +49,7 @@ class myPlayer:
         score = 0
         for p in self.pieces:
             score += getPieceScore(p.type)
-        return score
+        self.score = score
 
     def printMe(self):
         """
