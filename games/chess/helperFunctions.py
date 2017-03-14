@@ -87,7 +87,18 @@ def getPieceListAfterMove(pieceList, move):
     allPieces.remove(piece)
     for p in allPieces:
         if move.rank == p.rank and move.file == p.file:
-            allPieces.remove(p)
+
+            # Check for King moving into its own rook for castling
+            if p.type == "Rook" and p.color == move.piece.color:
+                # Update rooks position
+                if p.file == "h":
+                    p.file = "g"
+                elif p.file =="a":
+                    p.file = "b"
+
+            else:
+                allPieces.remove(p)
+
             break
 
     piece.rank = move.rank
