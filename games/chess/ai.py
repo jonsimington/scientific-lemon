@@ -65,7 +65,7 @@ class AI(BaseAI):
         myGame = gameState(self.game.fen)
 
         # Select a random move
-        moveToMake = minimaxMove(myGame, 2, self.player.color)
+        moveToMake = minimaxMove(myGame, 2, self.player.color, self.player.color)
 
         # Gets the Megaminer piece that is equivalent to my piece
         piece = getRealPiece(moveToMake.piece, self.player)

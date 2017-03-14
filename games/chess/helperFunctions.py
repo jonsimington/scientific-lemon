@@ -120,3 +120,10 @@ def findKing(pieces):
     for p in pieces:
         if p.type == "King":
             return p
+
+
+def getOppositeColorStr(color):
+    if color == "White":
+        return "Black"
+    else:
+        return "White"
