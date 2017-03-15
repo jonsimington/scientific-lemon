@@ -141,3 +141,10 @@ def getOppositeColorStr(color):
         return "Black"
     else:
         return "White"
+
+def myMoveCapture(move, myGame):
+    for p in myGame.whitePlayer.pieces + myGame.blackPlayer.pieces:
+        # Check if a piece was captured and ignores castling
+        if p.rank == move.rank and p.file == move.file and p.color != move.piece.color:
+            return True
+    return False

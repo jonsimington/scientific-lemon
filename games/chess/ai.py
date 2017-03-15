@@ -5,6 +5,12 @@ from games.chess.fenHelper import generateFen
 from games.chess.minimax import *
 import random
 
+# Last 8 turns
+moveHistory = [None] * 8
+# Current turn number for myself
+turnNum = 0
+# Track turns without pawn, promotions or capture for 8 turn tie rule
+turnWithoutChange = 0
 
 class AI(BaseAI):
     """ The basic AI functions that are the same between games. """
@@ -44,39 +50,6 @@ class AI(BaseAI):
         """
 
         # replace with your end logic
-
-    def run_turn(self):
-        """ This is called every time it is this AI.player's turn.
-
-        Returns:
-            bool: Represents if you want to end your turn. True means end your
-                  turn, False means to keep your turn going and re-call this
-                  function.
-        """
-
-        # print the board to the console
-        self.print_current_board()
-
-        # print the opponent's last move to the console
-        if len(self.game.moves) > 0:
-            print("Opponent's Last Move: '" + self.game.moves[-1].san + "'")
-
-        # Generate a game state
-        myGame = gameState(self.game.fen)
-
-        # Select a random move
-        moveToMake = minimaxMove(myGame, 2, self.player.color, self.player.color)
-
-        # Gets the Megaminer piece that is equivalent to my piece
-        piece = getRealPiece(moveToMake.piece, self.player)
-
-        # Make the piece move
-        piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
-
-        print(myGame.whitePlayer.score, myGame.blackPlayer.score, sep="\t")
-
-        return True  # to signify we are done with our turn.
-
     def print_current_board(self):
         """Prints the current board using pretty ASCII art
         Note: you can delete this function if you wish
@@ -123,3 +96,61 @@ class AI(BaseAI):
 
                 output += "|"
             print(output)
+
+    def run_turn(self):
+        """ This is called every time it is this AI.player's turn.
+
+        Returns:
+            bool: Represents if you want to end your turn. True means end your
+                  turn, False means to keep your turn going and re-call this
+                  function.
+        """
+
+        # Used to track states persistently
+        global turnWithoutChange
+        global turnNum
+
+        # print the board to the console
+        self.print_current_board()
+
+
+        # print the opponent's last move to the console
+        if len(self.game.moves) > 0:
+            print("Opponent's Last Move: '" + self.game.moves[-1].san + "'")
+
+
+            moveHistory[turnNum % 8] = createMoveTupleFromGame(self.game)
+            turnNum += 1
+
+            # Checks if a capture or panw movement occured
+            if self.game.moves[-1].piece == "Pawn" or self.game.moves[-1].captured is not None or self.game.moves[-1].promotion is not "":
+                turnWithoutChange = 0
+            else:
+                turnWithoutChange += 1
+
+        # Generate a game state
+        myGame = gameState(self.game.fen)
+
+        for i in range(0, 3):
+            # Select the move to make
+            moveToMake,score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum)
+
+
+        # Gets the Megaminer piece that is equivalent to my piece
+        piece = getRealPiece(moveToMake.piece, self.player)
+
+        # Make the piece move
+        piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
+
+        moveHistory[turnNum % 8] = createMoveTuple(moveToMake)
+        turnNum += 1
+
+
+        # Checks if a pawn moved or a piece was captured by my move
+        if moveToMake.piece == "Pawn" or abs(score) != abs(myGame.whitePlayer.score - myGame.blackPlayer.score):
+            turnWithoutChange = 0
+        else:
+            turnWithoutChange += 1
+
+        return True  # to signify we are done with our turn.
+
