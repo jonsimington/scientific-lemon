@@ -137,12 +137,23 @@ def findKing(pieces):
 
 
 def getOppositeColorStr(color):
+    """
+    Returns the opposite color of the string
+    :param color: Color as a string
+    :return: Color as a string
+    """
     if color == "White":
         return "Black"
     else:
         return "White"
 
 def myMoveCapture(move, myGame):
+    """
+    Returns if the move made captured a piece
+    :param move: Move to be made
+    :param myGame: The game state before the move is made
+    :return: True if a piece is captured
+    """
     for p in myGame.whitePlayer.pieces + myGame.blackPlayer.pieces:
         # Check if a piece was captured and ignores castling
         if p.rank == move.rank and p.file == move.file and p.color != move.piece.color:

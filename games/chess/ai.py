@@ -122,11 +122,7 @@ class AI(BaseAI):
             moveHistory[turnNum % 8] = createMoveTupleFromGame(self.game)
             turnNum += 1
 
-            # Checks if a capture or panw movement occured
-            if self.game.moves[-1].piece == "Pawn" or self.game.moves[-1].captured is not None or self.game.moves[-1].promotion is not "":
-                turnWithoutChange = 0
-            else:
-                turnWithoutChange += 1
+            turnWithoutChange = updateChangeCountFromGame(self.game, turnWithoutChange)
 
         # Generate a game state
         myGame = gameState(self.game.fen)
@@ -139,18 +135,15 @@ class AI(BaseAI):
         # Gets the Megaminer piece that is equivalent to my piece
         piece = getRealPiece(moveToMake.piece, self.player)
 
-        # Make the piece move
-        piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
-
+        # Update move history
         moveHistory[turnNum % 8] = createMoveTuple(moveToMake)
         turnNum += 1
 
+        # Update no change turn count
+        turnWithoutChange = updateChangeCount(turnWithoutChange, moveToMake, myGame)
 
-        # Checks if a pawn moved or a piece was captured by my move
-        if moveToMake.piece == "Pawn" or abs(score) != abs(myGame.whitePlayer.score - myGame.blackPlayer.score):
-            turnWithoutChange = 0
-        else:
-            turnWithoutChange += 1
+        # Make the piece move
+        piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
 
         return True  # to signify we are done with our turn.
 
