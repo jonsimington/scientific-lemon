@@ -5,6 +5,9 @@ from games.chess.fenHelper import generateFen
 from games.chess.minimax import *
 import random
 
+# Global depth limit 
+DEPTHLIMIT = 3
+
 # Last 8 turns
 moveHistory = [None] * 8
 # Current turn number for myself
@@ -106,7 +109,7 @@ class AI(BaseAI):
                   function.
         """
 
-        # Used to track states persistently
+        # Used to track states persistently from my and opponents move
         global turnWithoutChange
         global turnNum
 
@@ -118,16 +121,17 @@ class AI(BaseAI):
         if len(self.game.moves) > 0:
             print("Opponent's Last Move: '" + self.game.moves[-1].san + "'")
 
-
+			# Adds the previously made opponent move to history
             moveHistory[turnNum % 8] = createMoveTupleFromGame(self.game)
             turnNum += 1
-
+			
+			# Checks for the number of turns without change form opponent
             turnWithoutChange = updateChangeCountFromGame(self.game, turnWithoutChange)
 
         # Generate a game state
         myGame = gameState(self.game.fen)
 
-        for i in range(0, 3):
+        for i in range(0, DEPTHLIMIT):
             # Select the move to make
             moveToMake,score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum)
 

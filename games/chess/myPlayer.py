@@ -46,6 +46,10 @@ class myPlayer:
                 self.canQueenCastle = True
 
     def calculateScore(self):
+        """
+        Calculates the score for the player after all pieces are generated
+        :return: None
+        """
         score = 0
         for p in self.pieces:
             score += getPieceScore(p.type)
@@ -63,6 +67,11 @@ class myPlayer:
 
 
 def getPieceScore(type):
+    """
+    Calculates the score for the player after all pieces are generated
+    :param type: The type of piece as a string
+    :return: Integer standard value for the type
+    """
     if type == "Pawn":
         return 1
     elif type == "Knight" or type == "Bishop":

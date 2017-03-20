@@ -224,10 +224,10 @@ def checkForDraw(changeCount, moveHistory):
             return False
 
     # Check if the last moves 8 are all equal
-    if moveHistory[0][0] == moveHistory[4][0] and moveHistory[0][1] == moveHistory[4][1] and \
-        moveHistory[1][0] == moveHistory[5][0] and moveHistory[1][1] == moveHistory[5][1] and \
-        moveHistory[2][0] == moveHistory[6][0] and moveHistory[2][1] == moveHistory[6][1] and \
-        moveHistory[3][0] == moveHistory[7][0] and moveHistory[3][1] == moveHistory[7][1]:
+    if moveHistory[0] == moveHistory[4] and \
+        moveHistory[1] == moveHistory[5] and \
+        moveHistory[2] == moveHistory[6] and \
+        moveHistory[3] == moveHistory[7]:
         return True
 
     return False
@@ -242,8 +242,9 @@ def createMoveTuple(move):
     # Store the move into move history table
     oldPos = move.piece.file + str(move.piece.rank)
     newPos = move.file + str(move.rank)
-
-    return (oldPos, newPos)
+    pieceType = move.piece.type
+	
+    return (oldPos, newPos, pieceType)
 
 def createMoveTupleFromGame(game):
     """
@@ -254,8 +255,8 @@ def createMoveTupleFromGame(game):
     # Store my opponents move in history
     oldPos = game.moves[-1].from_file + str(game.moves[-1].from_rank)
     newPos = game.moves[-1].to_file + str(game.moves[-1].to_rank)
-
-    return (oldPos,newPos)
+    pieceType = game.moves[-1].piece.type
+    return (oldPos,newPos, pieceType)
 
 def updateChangeCount(changeCount, move, myGame):
     """
