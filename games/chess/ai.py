@@ -15,48 +15,49 @@ turnNum = 0
 # Track turns without pawn, promotions or capture for 8 turn tie rule
 turnWithoutChange = 0
 
+
 class AI(BaseAI):
     """ The basic AI functions that are the same between games. """
 
     def get_name(self):
         """ This is the name you send to the server so your AI will control the
-        player named this string.
+		player named this string.
 
-        Returns
-            str: The name of your Player.
-        """
+		Returns
+			str: The name of your Player.
+		"""
 
         return "Tim Buesking"  # REPLACE THIS WITH YOUR TEAM NAME
 
     def start(self):
         """ This is called once the game starts and your AI knows its playerID
-        and game. You can initialize your AI here.
-        """
+		and game. You can initialize your AI here.
+		"""
 
-        # replace with your start logic
+    # replace with your start logic
 
     def game_updated(self):
         """ This is called every time the game's state updates, so if you are
-        tracking anything you can update it here.
-        """
+		tracking anything you can update it here.
+		"""
 
-        # replace with your game updated logic
+    # replace with your game updated logic
 
     def end(self, won, reason):
         """ This is called when the game ends, you can clean up your data and
-        dump files here if need be.
+		dump files here if need be.
 
-        Args:
-            won (bool): True means you won, False means you lost.
-            reason (str): The human readable string explaining why you won or
-                          lost.
-        """
+		Args:
+			won (bool): True means you won, False means you lost.
+			reason (str): The human readable string explaining why you won or
+						  lost.
+		"""
 
-        # replace with your end logic
+    # replace with your end logic
     def print_current_board(self):
         """Prints the current board using pretty ASCII art
-        Note: you can delete this function if you wish
-        """
+		Note: you can delete this function if you wish
+		"""
 
         # iterate through the range in reverse order
         for r in range(9, -2, -1):
@@ -103,11 +104,11 @@ class AI(BaseAI):
     def run_turn(self):
         """ This is called every time it is this AI.player's turn.
 
-        Returns:
-            bool: Represents if you want to end your turn. True means end your
-                  turn, False means to keep your turn going and re-call this
-                  function.
-        """
+		Returns:
+			bool: Represents if you want to end your turn. True means end your
+				  turn, False means to keep your turn going and re-call this
+				  function.
+		"""
 
         # Used to track states persistently from my and opponents move
         global turnWithoutChange
@@ -116,16 +117,15 @@ class AI(BaseAI):
         # print the board to the console
         self.print_current_board()
 
-
         # print the opponent's last move to the console
         if len(self.game.moves) > 0:
             print("Opponent's Last Move: '" + self.game.moves[-1].san + "'")
 
-			# Adds the previously made opponent move to history
+            # Adds the previously made opponent move to history
             moveHistory[turnNum % 8] = createMoveTupleFromGame(self.game)
             turnNum += 1
-			
-			# Checks for the number of turns without change form opponent
+
+            # Checks for the number of turns without change form opponent
             turnWithoutChange = updateChangeCountFromGame(self.game, turnWithoutChange)
 
         # Generate a game state
@@ -133,8 +133,7 @@ class AI(BaseAI):
 
         for i in range(0, DEPTHLIMIT):
             # Select the move to make
-            moveToMake,score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum)
-
+            moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum)
 
         # Gets the Megaminer piece that is equivalent to my piece
         piece = getRealPiece(moveToMake.piece, self.player)
@@ -150,4 +149,3 @@ class AI(BaseAI):
         piece.move(moveToMake.file, moveToMake.rank, moveToMake.promotion)
 
         return True  # to signify we are done with our turn.
-

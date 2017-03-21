@@ -92,11 +92,11 @@ def getPieceListAfterMove(pieceList, move):
                 # Update rooks position
                 if p.file == "h":
                     p.file = "g"
-                elif p.file =="a":
+                elif p.file == "a":
                     p.file = "b"
 
             else:
-               allPieces.remove(p)
+                allPieces.remove(p)
 
             break
 
@@ -146,6 +146,7 @@ def getOppositeColorStr(color):
         return "Black"
     else:
         return "White"
+
 
 def myMoveCapture(move, myGame):
     """

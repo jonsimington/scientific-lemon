@@ -165,18 +165,14 @@ def getBishopMove(piece, me, opp):
     downLeft = True
 
     for i in range(1, 8):
-
         # Check if can still move up and to the right, and not hit ourselves,
         if upRight and piece.rank + i != 9 and getNewLetter(piece.file, i) is not "i" \
                 and not isSquareOccupied(piece.rank + i, getNewLetter(piece.file, i), me.pieces):
+            myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
 
             # Check if hitting an opponent piece
             if isSquareOccupied(piece.rank + i, getNewLetter(piece.file, i), opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
                 upRight = False
-
-            else:
-                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, i)))
         else:
             upRight = False
 
@@ -184,26 +180,21 @@ def getBishopMove(piece, me, opp):
         # ' is the character that proceeds a in char values
         if upLeft and piece.rank + i != 9 and getNewLetter(piece.file, -i) is not "`" \
                 and not isSquareOccupied(piece.rank + i, getNewLetter(piece.file, -i), me.pieces):
-
+            myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, -i)))
             # Check if hitting an opponent piece
             if isSquareOccupied(piece.rank + i, getNewLetter(piece.file, -i), opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, -i)))
                 upLeft = False
-            else:
-                myMoves.append(pieceMove(piece, piece.rank + i, getNewLetter(piece.file, -i)))
         else:
             upLeft = False
 
         # Check if we go too far down, hit ourselves, or to the right
         if downRight and piece.rank - i != 0 and getNewLetter(piece.file, i) is not "i" \
                 and not isSquareOccupied(piece.rank - i, getNewLetter(piece.file, i), me.pieces):
+            myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, i)))
 
             # Check if hitting an opponent piece
             if isSquareOccupied(piece.rank - i, getNewLetter(piece.file, i), opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, i)))
                 downRight = False
-            else:
-                myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, i)))
         else:
             downRight = False
 
@@ -211,13 +202,11 @@ def getBishopMove(piece, me, opp):
         # ' is the character that proceeds a in char values
         if downLeft and piece.rank - i != 0 and getNewLetter(piece.file, -i) is not "`" \
                 and not isSquareOccupied(piece.rank - i, getNewLetter(piece.file, -i), me.pieces):
+            myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, -i)))
 
             # Check if hitting an opponent piece
             if isSquareOccupied(piece.rank - i, getNewLetter(piece.file, -i), opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, -i)))
                 downLeft = False
-            else:
-                myMoves.append(pieceMove(piece, piece.rank - i, getNewLetter(piece.file, -i)))
         else:
             downLeft = False
 
@@ -244,24 +233,20 @@ def getRookMove(piece, me, opp):
     for i in range(1, 8):
         # Can move up without hitting top or ally piece
         if up and piece.rank + i != 9 and not isSquareOccupied(piece.rank + i, piece.file, me.pieces):
+            myMoves.append(pieceMove(piece, piece.rank + i, piece.file))
             # Hit enemy piece
             if isSquareOccupied(piece.rank + i, piece.file, opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank + i, piece.file))
                 up = False
-            else:
-                myMoves.append(pieceMove(piece, piece.rank + i, piece.file))
+
         else:
             up = False
 
         # Can move down without hitting bottom or ally piece
         if down and piece.rank - i != 0 and not isSquareOccupied(piece.rank - i, piece.file, me.pieces):
-
+            myMoves.append(pieceMove(piece, piece.rank - i, piece.file))
             # Hit enemy piece
             if isSquareOccupied(piece.rank - i, piece.file, opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank - i, piece.file))
                 down = False
-            else:
-                myMoves.append(pieceMove(piece, piece.rank - i, piece.file))
         else:
             down = False
 
@@ -269,13 +254,10 @@ def getRookMove(piece, me, opp):
         if right and getNewLetter(piece.file, i) is not "i" and not isSquareOccupied(piece.rank,
                                                                                      getNewLetter(piece.file, i),
                                                                                      me.pieces):
-
+            myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, i)))
             # Hit enemy piece
             if isSquareOccupied(piece.rank, getNewLetter(piece.file, i), opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, i)))
                 right = False
-            else:
-                myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, i)))
         else:
             right = False
 
@@ -283,13 +265,10 @@ def getRookMove(piece, me, opp):
         if left and getNewLetter(piece.file, -i) is not "`" and not isSquareOccupied(piece.rank,
                                                                                      getNewLetter(piece.file, -i),
                                                                                      me.pieces):
-
+            myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, -i)))
             # Hit enemy piece
             if isSquareOccupied(piece.rank, getNewLetter(piece.file, -i), opp.pieces):
-                myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, -i)))
                 left = False
-            else:
-                myMoves.append(pieceMove(piece, piece.rank, getNewLetter(piece.file, -i)))
         else:
             left = False
 

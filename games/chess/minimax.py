@@ -3,10 +3,12 @@ from games.chess.fenHelper import generateFen
 from games.chess.gameState import *
 import random
 
+
 class moveScore:
-    def __init__(self, move,score):
+    def __init__(self, move, score):
         self.myMove = move
         self.myScore = score
+
 
 def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNum):
     """
@@ -23,7 +25,7 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
     moveList = getMove(myGame, playerMoveColor)
 
     # Final list of possible moves
-    validMoves= []
+    validMoves = []
 
     # Check if any moves put the player in check
     for move in moveList:
@@ -32,7 +34,6 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
 
         # Validates no illegal moves are made
         if not checkIfInCheck(newFen, playerMoveColor):
-
             # Create a copy of move history
             newMoveHistory = deepcopy(moveHistory)
             tempTurnNum = turnNum + 1
@@ -41,8 +42,8 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
             # Updates change count
             tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
-
-            score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), playerMoveColor, tempChangeCount, newMoveHistory, tempTurnNum)
+            score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), playerMoveColor,
+                               tempChangeCount, newMoveHistory, tempTurnNum)
             validMoves.append(moveScore(move, score))
 
     # Best possible move
@@ -55,7 +56,7 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
             bestMove = [move.myMove]
             currScore = move.myScore
         elif move.myScore == currScore:
-                bestMove.append(move.myMove)
+            bestMove.append(move.myMove)
 
     return random.choice(bestMove), currScore
 
@@ -80,7 +81,7 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
         if checkForDraw(changeCount, moveHistory):
             return 0
 
-         # Recursive base case
+            # Recursive base case
         if depth <= 0:
             return heuristicScore(myGame.blackPlayer.score, myGame.whitePlayer.score, myColor)
 
@@ -89,7 +90,7 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
             moveList = getMove(myGame, playerMoveColor)
 
             # Final list of possible moves
-            validMoves= []
+            validMoves = []
 
             # Check if any moves put the player in check
             for move in moveList:
@@ -107,7 +108,8 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                 tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
                 if not checkIfInCheck(newFen, playerMoveColor):
-                    score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor, tempChangeCount, newMoveHistory, tempTurnNum)
+                    score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor,
+                                       tempChangeCount, newMoveHistory, tempTurnNum)
                     validMoves.append(moveScore(move, score))
 
             # Best possible score
@@ -156,7 +158,7 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
             moveList = getMove(myGame, playerMoveColor)
 
             # Final list of possible moves
-            validMoves= []
+            validMoves = []
 
             # Check if any moves put the player in check
             for move in moveList:
@@ -165,7 +167,6 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
 
                 # Validates no illegal moves are made
                 if not checkIfInCheck(newFen, playerMoveColor):
-
                     # Create a copy of move history
                     newMoveHistory = deepcopy(moveHistory)
                     tempTurnNum = turnNum + 1
@@ -225,9 +226,9 @@ def checkForDraw(changeCount, moveHistory):
 
     # Check if the last moves 8 are all equal
     if moveHistory[0] == moveHistory[4] and \
-        moveHistory[1] == moveHistory[5] and \
-        moveHistory[2] == moveHistory[6] and \
-        moveHistory[3] == moveHistory[7]:
+                    moveHistory[1] == moveHistory[5] and \
+                    moveHistory[2] == moveHistory[6] and \
+                    moveHistory[3] == moveHistory[7]:
         return True
 
     return False
@@ -243,8 +244,9 @@ def createMoveTuple(move):
     oldPos = move.piece.file + str(move.piece.rank)
     newPos = move.file + str(move.rank)
     pieceType = move.piece.type
-	
+
     return (oldPos, newPos, pieceType)
+
 
 def createMoveTupleFromGame(game):
     """
@@ -256,7 +258,8 @@ def createMoveTupleFromGame(game):
     oldPos = game.moves[-1].from_file + str(game.moves[-1].from_rank)
     newPos = game.moves[-1].to_file + str(game.moves[-1].to_rank)
     pieceType = game.moves[-1].piece.type
-    return (oldPos,newPos, pieceType)
+    return (oldPos, newPos, pieceType)
+
 
 def updateChangeCount(changeCount, move, myGame):
     """
@@ -270,6 +273,7 @@ def updateChangeCount(changeCount, move, myGame):
         return 0
     else:
         return changeCount + 1
+
 
 def updateChangeCountFromGame(game, turnWithoutChange):
     """
