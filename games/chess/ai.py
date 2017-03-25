@@ -6,7 +6,7 @@ from games.chess.minimax import *
 import random
 
 # Global depth limit 
-DEPTHLIMIT = 3
+DEPTHLIMIT = 5
 
 # Last 8 turns
 moveHistory = [None] * 8

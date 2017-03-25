@@ -9,7 +9,6 @@ class moveScore:
         self.myMove = move
         self.myScore = score
 
-
 def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNum):
     """
     The minimax calculation of the game at the current state
@@ -21,6 +20,11 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
     :param turnNum: Current overall turn number
     :return: Best possible move to be made to maximize heuristic value
     """
+
+    # Reset alpha beta values for pruning
+    alpha = -999
+    beta = 999
+
     # List of all possible moves
     moveList = getMove(myGame, playerMoveColor)
 
@@ -43,25 +47,21 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
             tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
             score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), playerMoveColor,
-                               tempChangeCount, newMoveHistory, tempTurnNum)
-            validMoves.append(moveScore(move, score))
+                               tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta)
 
-    # Best possible move
-    bestMove = []
+            if score is not None:
+                if score > alpha:
+                    alpha = score
+                    # Empty list of moves worse than current move score
+                    validMoves = []
+                    validMoves.append(moveScore(move, score))
+                elif score == alpha:
+                    validMoves.append(moveScore(move, score))
 
-    # Default the score to really low value
-    currScore = -999
-    for move in validMoves:
-        if move.myScore is not None and move.myScore > currScore:
-            bestMove = [move.myMove]
-            currScore = move.myScore
-        elif move.myScore == currScore:
-            bestMove.append(move.myMove)
-
-    return random.choice(bestMove), currScore
+    return random.choice(validMoves).myMove, alpha
 
 
-def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum):
+def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta):
     """
     Gets the max possible move for the passed FEN state
     :param fen: FEN state to create moves for
@@ -75,6 +75,8 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
     """
     # Ignores moves where the game has ended
     if "K" in fen and "k" in fen:
+        highscore = None
+
         myGame = gameState(fen)
 
         # Check if this move creates a draw
@@ -82,53 +84,50 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
             return 0
 
             # Recursive base case
-        if depth <= 0:
+        elif depth <= 0:
             return heuristicScore(myGame.blackPlayer.score, myGame.whitePlayer.score, myColor)
 
         else:
             # List of all possible moves
             moveList = getMove(myGame, playerMoveColor)
 
-            # Final list of possible moves
-            validMoves = []
-
             # Check if any moves put the player in check
             for move in moveList:
                 # Creates a FEN based on the move made
                 newFen = generateFen(myGame, move, playerMoveColor)
 
-                # Validates no illegal moves are made
-
-                # Create a copy of move history
-                newMoveHistory = deepcopy(moveHistory)
-                tempTurnNum = turnNum + 1
-                # Add newly made move to history
-                newMoveHistory[tempTurnNum % 8] = createMoveTuple(move)
-                # Updates change count
-                tempChangeCount = updateChangeCount(changeCount, move, myGame)
-
                 if not checkIfInCheck(newFen, playerMoveColor):
+                    # Create a copy of move history
+                    newMoveHistory = deepcopy(moveHistory)
+                    tempTurnNum = turnNum + 1
+                    # Add newly made move to history
+                    newMoveHistory[tempTurnNum % 8] = createMoveTuple(move)
+                    # Updates change count
+                    tempChangeCount = updateChangeCount(changeCount, move, myGame)
+
                     score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor,
-                                       tempChangeCount, newMoveHistory, tempTurnNum)
-                    validMoves.append(moveScore(move, score))
+                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta)
 
-            # Best possible score
-            currScore = -999
-            for move in validMoves:
-                # Check that the move has a score, it will not if the game ends
-                if move.myScore is not None and move.myScore > currScore:
-                    currScore = move.myScore
+                    # Make sure a value is returned
+                    if score is not None:
+                        # Fail High Prune
+                        if score >= beta:
+                            print("BETA PRUNE: "+ str(beta) + "\t" + str(score))
+                            return score
+                        # Update alpha value
+                        elif score > alpha:
+                            alpha = score
 
-            # Default the score to really low value
-            if currScore == -999:
-                return None
-            else:
-                return currScore
+                        # Set new best score found
+                        if highscore is None or score > highscore :
+                            highscore = score
+
+        return highscore
     else:
         return None
 
 
-def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum):
+def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta):
     """
     Gets the min possible move for the passed FEN state
     :param fen: FEN state to create moves for
@@ -142,6 +141,7 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
     """
     # Ignores moves where the game has ended
     if "K" in fen and "k" in fen:
+        highscore = None
 
         myGame = gameState(fen)
 
@@ -156,9 +156,6 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
         else:
             # List of all possible moves
             moveList = getMove(myGame, playerMoveColor)
-
-            # Final list of possible moves
-            validMoves = []
 
             # Check if any moves put the player in check
             for move in moveList:
@@ -176,21 +173,18 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                     tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
                     score = getMaxMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor,
-                                       tempChangeCount, newMoveHistory, tempTurnNum)
-                    validMoves.append(moveScore(move, score))
+                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta)
 
-            # Best possible score
-            # Default the score to really largevalue
-            currScore = 999
-            for move in validMoves:
-                # Check that the move has a score, it will not if the game ends
-                if move.myScore is not None and move.myScore < currScore:
-                    currScore = move.myScore
+                    if score is not None:
+                        if score <= alpha:
+                            print("ALPHA PRUNE: " + str(alpha) + "\t" + str(score))
+                            return score
+                        elif score < beta:
+                            beta = score
 
-            if currScore == 999:
-                return None
-            else:
-                return currScore
+                        if highscore is None or score > highscore :
+                            highscore = score
+        return  highscore
     else:
         return None
 
