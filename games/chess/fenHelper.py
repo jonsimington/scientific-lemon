@@ -227,3 +227,41 @@ def getPiecesFromFen(color, fen):
 
             file = getNewLetter(file, 1)
     return myPieces
+
+
+def getScoreFromFen(fen, myColor):
+    blackScore = 0
+    whiteScore = 0
+
+    pieces = fen.split()[0]
+    for char in pieces:
+        if char == "P":
+            whiteScore += getPieceScore("Pawn")
+        elif char == "p":
+            blackScore += getPieceScore("Pawn")
+        elif char == "R":
+            whiteScore += getPieceScore("Rook")
+        elif char == "r":
+            blackScore += getPieceScore("Rook")
+        elif char == "N":
+            whiteScore += getPieceScore("Knight")
+        elif char == "n":
+            blackScore += getPieceScore("Knight")
+        elif char == "B":
+            whiteScore += getPieceScore("Bishop")
+        elif char == "b":
+            blackScore += getPieceScore("Bishop")
+        elif char == "Q":
+            whiteScore += getPieceScore("Queen")
+        elif char == "q":
+            blackScore += getPieceScore("Queen")
+        elif char == "K":
+            whiteScore += getPieceScore("King")
+        elif char == "k":
+            blackScore += getPieceScore("King")
+
+    if myColor == "Black":
+
+        return blackScore - whiteScore
+    else:
+        return whiteScore - blackScore

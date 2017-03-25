@@ -160,3 +160,22 @@ def myMoveCapture(move, myGame):
         if p.rank == move.rank and p.file == move.file and p.color != move.piece.color:
             return True
     return False
+
+
+def getPieceScore(type):
+    """
+    Calculates the score for the player after all pieces are generated
+    :param type: The type of piece as a string
+    :return: Integer standard value for the type
+    """
+    if type == "Pawn":
+        return 1
+    elif type == "Knight" or type == "Bishop":
+        return 3
+    elif type == "Rook":
+        return 5
+    elif type == "Queen":
+        return 9
+    # Create a state where killing king is preferred
+    else:
+        return 10

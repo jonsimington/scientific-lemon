@@ -1,5 +1,5 @@
 from games.chess.generateMoves import getMove, checkIfInCheck
-from games.chess.fenHelper import generateFen
+from games.chess.fenHelper import generateFen, getScoreFromFen
 from games.chess.gameState import *
 import random
 
@@ -77,17 +77,17 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
     if "K" in fen and "k" in fen:
         highscore = None
 
-        myGame = gameState(fen)
-
         # Check if this move creates a draw
         if checkForDraw(changeCount, moveHistory):
             return 0
 
             # Recursive base case
         elif depth <= 0:
-            return heuristicScore(myGame.blackPlayer.score, myGame.whitePlayer.score, myColor)
+            return getScoreFromFen(fen, myColor)
 
         else:
+            myGame = gameState(fen)
+
             # List of all possible moves
             moveList = getMove(myGame, playerMoveColor)
 
@@ -112,7 +112,7 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                     if score is not None:
                         # Fail High Prune
                         if score >= beta:
-                            print("BETA PRUNE: "+ str(beta) + "\t" + str(score))
+
                             return score
                         # Update alpha value
                         elif score > alpha:
@@ -124,8 +124,7 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
 
         return highscore
     else:
-        return None
-
+        return getScoreFromFen(fen, myColor)
 
 def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta):
     """
@@ -143,7 +142,6 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
     if "K" in fen and "k" in fen:
         highscore = None
 
-        myGame = gameState(fen)
 
         # Check if this move creates a draw
         if checkForDraw(changeCount, moveHistory):
@@ -151,9 +149,11 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
 
         # Recursive base case
         elif depth <= 0:
-            return heuristicScore(myGame.blackPlayer.score, myGame.whitePlayer.score, myColor)
+            return getScoreFromFen(fen, myColor)
 
         else:
+            myGame = gameState(fen)
+
             # List of all possible moves
             moveList = getMove(myGame, playerMoveColor)
 
@@ -177,7 +177,6 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
 
                     if score is not None:
                         if score <= alpha:
-                            print("ALPHA PRUNE: " + str(alpha) + "\t" + str(score))
                             return score
                         elif score < beta:
                             beta = score
@@ -186,8 +185,7 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                             highscore = score
         return  highscore
     else:
-        return None
-
+        return getScoreFromFen(fen, myColor)
 
 def heuristicScore(blackScore, whiteScore, myColor):
     """
