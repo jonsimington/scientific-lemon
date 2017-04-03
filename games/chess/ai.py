@@ -2,11 +2,15 @@
 from joueur.base_ai import BaseAI
 from games.chess.generateMoves import *
 from games.chess.fenHelper import generateFen
+
 from games.chess.minimax import *
+import datetime
 import random
 
 # Global depth limit 
-DEPTHLIMIT = 4
+DEPTHLIMIT = 10
+# Global time limit per turn in microseconds
+TIMELIMIT = 1000000
 
 # Last 8 turns
 moveHistory = [None] * 8
@@ -130,10 +134,19 @@ class AI(BaseAI):
 
         # Generate a game state
         myGame = gameState(self.game.fen)
+        startTime = datetime.datetime.now()
 
         for i in range(0, DEPTHLIMIT):
-            # Select the move to make
-            moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum)
+            # Calculate time spent searching in microseconds
+            timeSpent = (datetime.datetime.now() - startTime)
+            timeInMicro = timeSpent.seconds * 1000000 + timeSpent.microseconds
+
+            if timeInMicro < TIMELIMIT:
+                # Select the move to make
+                moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum)
+            else:
+                break
+
 
         # Gets the Megaminer piece that is equivalent to my piece
         piece = getRealPiece(moveToMake.piece, self.player)
