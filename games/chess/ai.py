@@ -7,7 +7,7 @@ from games.chess.minimax import *
 import datetime
 import random
 
-# Global depth limit 
+# Global depth limit
 DEPTHLIMIT = 999
 # Global time limit per turn in microseconds
 TIMELIMIT = 1000000
@@ -142,7 +142,7 @@ class AI(BaseAI):
 
             if timeInMicro < TIMELIMIT:
                 # Select the move to make
-                moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum, historyTable)
+                moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum, historyTable, 2)
             else:
                 print(str(i-1))
                 break

@@ -136,17 +136,9 @@ def getPawnMove(piece, me, opp, passant):
     # Adds promotion tag as necessary
     for move in myMoves:
         if move.rank == 1 or move.rank == 8:
-            qProm = deepcopy(move)
-            qProm.promotion = "Queen"
-            finalMoves.append(qProm)
-
-            rProm = deepcopy(move)
-            rProm.promotion = "Rook"
-            finalMoves.append(rProm)
-
-            bProm = deepcopy(move)
-            bProm.promotion = "Bishop"
-            finalMoves.append(bProm)
+            finalMoves.append(pieceMove(move.piece,move.rank, move.file, "Queen"))
+            finalMoves.append(pieceMove(move.piece, move.rank, move.file, "Rook"))
+            finalMoves.append(pieceMove(move.piece, move.rank, move.file, "Bishop"))
 
             move.promotion = "Knight"
             finalMoves.append(move)
