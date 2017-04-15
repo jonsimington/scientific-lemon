@@ -1,4 +1,3 @@
-import random
 from games.chess.gameState import *
 
 
@@ -30,6 +29,7 @@ class pieceMove:
         :return: True
         """
         return True
+
 
 def getMove(myGame, colorToMove):
     """
@@ -136,7 +136,7 @@ def getPawnMove(piece, me, opp, passant):
     # Adds promotion tag as necessary
     for move in myMoves:
         if move.rank == 1 or move.rank == 8:
-            finalMoves.append(pieceMove(move.piece,move.rank, move.file, "Queen"))
+            finalMoves.append(pieceMove(move.piece, move.rank, move.file, "Queen"))
             finalMoves.append(pieceMove(move.piece, move.rank, move.file, "Rook"))
             finalMoves.append(pieceMove(move.piece, move.rank, move.file, "Bishop"))
 
@@ -355,7 +355,7 @@ def getKingMove(piece, me, opp):
 
 def getCastleMoves(piece, me, opp):
     """
-    Gets the list of all possble castle moves
+    Gets the list of all possible castle moves
     :param piece: King to castle
     :param me: The myPlayer object of the moving
     :param opp: The myPlayer object of the opponent of the moving player

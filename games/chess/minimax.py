@@ -39,11 +39,11 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
     moveList = getMove(myGame, playerMoveColor)
 
     # Priority queue for moves in history table
-    moveQueue= createMoveQueue(historyTable, moveList, myGame, playerMoveColor)
+    moveQueue = createMoveQueue(historyTable, moveList, myGame, playerMoveColor)
 
     # Check if any moves put the player in check
     while not moveQueue.empty():
-        historyValue,  move = moveQueue.get()
+        historyValue, move = moveQueue.get()
 
         # Creates a FEN based on the move made
         newFen = generateFen(myGame, move, playerMoveColor)
@@ -59,14 +59,14 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
             tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
             score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), playerMoveColor,
-                               tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable, currStateScore, quiDepth )
+                               tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable, currStateScore,
+                               quiDepth)
 
             if score is not None:
                 if score > alpha:
                     alpha = score
                     # Empty list of moves worse than current move score
-                    validMoves = []
-                    validMoves.append(moveScore(move, score))
+                    validMoves = [moveScore(move, score)]
                 elif score == alpha:
                     validMoves.append(moveScore(move, score))
 
@@ -78,14 +78,14 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
     return moveToMake, score
 
 
-
-def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta, historyTable, prevScore, quiDepth):
+def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta, historyTable,
+               prevScore, quiDepth):
     """
     :param fen: FEN state to create moves for
     :param depth: How much further to evaluated
     :param playerMoveColor: Player to move for this turn
     :param myColor: My actual color
-    :param changeCount: How many turns since a change has occured
+    :param changeCount: How many turns since a change has occurred
     :param moveHistory: History of all moves made in the last 8 turns
     :param turnNum: Current turn number
     :param alpha: Alpha value for alpha beta pruning indicating lower bound
@@ -145,10 +145,12 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
 
                     if depth >= 1:
                         score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor,
-                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable, currStateScore, quiDepth)
+                                           tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable,
+                                           currStateScore, quiDepth)
                     else:
                         score = getMinMove(newFen, depth, getOppositeColorStr(playerMoveColor), myColor,
-                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable, currStateScore, quiDepth - 1)
+                                           tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable,
+                                           currStateScore, quiDepth - 1)
 
                     # Make sure a value is returned
                     if score is not None:
@@ -161,7 +163,7 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                             alpha = score
 
                         # Set new best score found
-                        if highscore is None or score > highscore :
+                        if highscore is None or score > highscore:
                             highscore = score
         incrementHistoryTable(fen, historyTable)
         return highscore
@@ -169,7 +171,9 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
         incrementHistoryTable(fen, historyTable)
         return getScoreFromFen(fen, myColor)
 
-def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta, historyTable, prevScore, quiDepth):
+
+def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta, historyTable,
+               prevScore, quiDepth):
     """
     :param fen: FEN state to create moves for
     :param depth: How much further to evaluated
@@ -229,10 +233,12 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                     # Make sure not searching quiescence
                     if depth >= 1:
                         score = getMaxMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor,
-                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable, currStateScore, quiDepth)
+                                           tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable,
+                                           currStateScore, quiDepth)
                     else:
                         score = getMaxMove(newFen, depth, getOppositeColorStr(playerMoveColor), myColor,
-                                           tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable, currStateScore, quiDepth - 1)
+                                           tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable,
+                                           currStateScore, quiDepth - 1)
 
                     if score is not None:
                         if score <= alpha:
@@ -240,15 +246,16 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                         elif score < beta:
                             beta = score
 
-                        if highscore is None or score > highscore :
+                        if highscore is None or score > highscore:
                             highscore = score
 
         incrementHistoryTable(fen, historyTable)
-        return  highscore
+        return highscore
     else:
 
         incrementHistoryTable(fen, historyTable)
         return getScoreFromFen(fen, myColor)
+
 
 def heuristicScore(blackScore, whiteScore, myColor):
     """
@@ -337,7 +344,7 @@ def updateChangeCountFromGame(game, turnWithoutChange):
     :param turnWithoutChange: turns without a change
     :return: Updated change count as int
     """
-    # Checks if a capture or panw movement occured
+    # Checks if a capture or pawn movement occurred
     if game.moves[-1].piece == "Pawn" or game.moves[-1].captured is not None or game.moves[-1].promotion is not "":
         return 0
     else:
@@ -346,7 +353,7 @@ def updateChangeCountFromGame(game, turnWithoutChange):
 
 def incrementHistoryTable(fen, historyTable):
     """
-    Increments the history table whenever a move is found preferental
+    Increments the history table whenever a move is found preferred 
     :param fen: Fen string of the state
     :param historyTable: The history move table
     :return: None
@@ -378,4 +385,3 @@ def createMoveQueue(historyTable, moveList, myGame, playerMoveColor):
             moveQueue.put((-historyTable[newFen], move))
 
     return moveQueue
-

@@ -1,11 +1,8 @@
 # This is where you build your AI for the Chess game.
-from joueur.base_ai import BaseAI
-from games.chess.generateMoves import *
-from games.chess.fenHelper import generateFen
+import datetime
 
 from games.chess.minimax import *
-import datetime
-import random
+from joueur.base_ai import BaseAI
 
 # Global depth limit
 DEPTHLIMIT = 999
@@ -18,6 +15,7 @@ moveHistory = [None] * 8
 turnNum = 0
 # Track turns without pawn, promotions or capture for 8 turn tie rule
 turnWithoutChange = 0
+
 
 class AI(BaseAI):
     """ The basic AI functions that are the same between games. """
@@ -121,7 +119,6 @@ class AI(BaseAI):
 
         # print the opponent's last move to the console
         if len(self.game.moves) > 0:
-
             # Adds the previously made opponent move to history
             moveHistory[turnNum % 8] = createMoveTupleFromGame(self.game)
             turnNum += 1
@@ -142,11 +139,11 @@ class AI(BaseAI):
 
             if timeInMicro < TIMELIMIT:
                 # Select the move to make
-                moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum, historyTable, 2)
+                moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum,
+                                                historyTable, 2)
             else:
-                print(str(i-1))
+                print(str(i - 1))
                 break
-
 
         # Gets the Megaminer piece that is equivalent to my piece
         piece = getRealPiece(moveToMake.piece, self.player)

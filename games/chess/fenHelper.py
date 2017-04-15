@@ -78,7 +78,7 @@ def getKingQueenCastleFen(move, myGame):
         fen += "K"
 
     if not myGame.whitePlayer.canQueenCastle \
-            or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 1)\
+            or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 1) \
             or (move.piece.type == "King" and move.piece.file == "a"):
 
         fen += "-"
@@ -86,7 +86,7 @@ def getKingQueenCastleFen(move, myGame):
         fen += "Q"
 
     if not myGame.blackPlayer.canKingCastle \
-            or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 8)\
+            or (move.piece.type == "Rook" and move.piece.file == "h" and move.piece.rank == 8) \
             or (move.piece.type == "King" and move.piece.file == "h"):
 
         fen += "-"
@@ -94,7 +94,7 @@ def getKingQueenCastleFen(move, myGame):
         fen += "k"
 
     if not myGame.blackPlayer.canQueenCastle \
-            or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 8)\
+            or (move.piece.type == "Rook" and move.piece.file == "a" and move.piece.rank == 8) \
             or (move.piece.type == "King" and move.piece.file == "a"):
 
         fen += "-"
