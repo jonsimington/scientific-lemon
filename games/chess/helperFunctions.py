@@ -177,5 +177,7 @@ def getPieceScore(type):
     elif type == "Queen":
         return 9
     # Create a state where killing king is preferred
+    elif type == "King":
+        return 20
     else:
-        return 10
+        return 0

@@ -8,7 +8,7 @@ import datetime
 import random
 
 # Global depth limit 
-DEPTHLIMIT = 10
+DEPTHLIMIT = 999
 # Global time limit per turn in microseconds
 TIMELIMIT = 1000000
 
@@ -18,7 +18,6 @@ moveHistory = [None] * 8
 turnNum = 0
 # Track turns without pawn, promotions or capture for 8 turn tie rule
 turnWithoutChange = 0
-
 
 class AI(BaseAI):
     """ The basic AI functions that are the same between games. """
@@ -119,11 +118,9 @@ class AI(BaseAI):
         global turnNum
 
         # print the board to the console
-        self.print_current_board()
 
         # print the opponent's last move to the console
         if len(self.game.moves) > 0:
-            print("Opponent's Last Move: '" + self.game.moves[-1].san + "'")
 
             # Adds the previously made opponent move to history
             moveHistory[turnNum % 8] = createMoveTupleFromGame(self.game)
@@ -136,6 +133,8 @@ class AI(BaseAI):
         myGame = gameState(self.game.fen)
         startTime = datetime.datetime.now()
 
+        # History table of moves
+        historyTable = {}
         for i in range(0, DEPTHLIMIT):
             # Calculate time spent searching in microseconds
             timeSpent = (datetime.datetime.now() - startTime)
@@ -143,8 +142,9 @@ class AI(BaseAI):
 
             if timeInMicro < TIMELIMIT:
                 # Select the move to make
-                moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum)
+                moveToMake, score = minimaxMove(myGame, i, self.player.color, turnWithoutChange, moveHistory, turnNum, historyTable)
             else:
+                print(str(i-1))
                 break
 
 

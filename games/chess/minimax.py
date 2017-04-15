@@ -1,3 +1,5 @@
+import queue
+
 from games.chess.generateMoves import getMove, checkIfInCheck
 from games.chess.fenHelper import generateFen, getScoreFromFen
 from games.chess.gameState import *
@@ -9,7 +11,43 @@ class moveScore:
         self.myMove = move
         self.myScore = score
 
-def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNum):
+def incrementHistoryTable(fen, historyTable):
+    """
+    Increments the history table whenever a move is found preferental
+    :param fen: Fen string of the state
+    :param historyTable: The history move table
+    :return: None
+    """
+    if fen not in historyTable:
+        historyTable[fen] = 0
+    else:
+        historyTable[fen] += 1
+
+
+def createMoveQueue(historyTable, moveList, myGame, playerMoveColor):
+    """
+    Creates a priority move queue based on the historyTable values of the moves
+    :param historyTable: History table of moves containing 
+    :param moveList: List of all possible moves
+    :param myGame: My current game
+    :param playerMoveColor: Player to move
+    :return: Priority queue with the preferred moves being a negative number 
+    """
+    moveQueue = queue.PriorityQueue()
+    for move in moveList:
+        # Creates a FEN based on the move made
+        newFen = generateFen(myGame, move, playerMoveColor)
+        if newFen not in historyTable:
+            historyTable[newFen] = 0
+            moveQueue.put((0, move))
+        else:
+            # Gets the value from the history table and then negates it that way it is a higher priority than 0
+            moveQueue.put((-historyTable[newFen], move))
+
+    return moveQueue
+
+
+def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNum, historyTable):
     """
     The minimax calculation of the game at the current state
     :param myGame: The current game state
@@ -25,14 +63,19 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
     alpha = -999
     beta = 999
 
-    # List of all possible moves
-    moveList = getMove(myGame, playerMoveColor)
-
     # Final list of possible moves
     validMoves = []
 
+    # List of all possible moves
+    moveList = getMove(myGame, playerMoveColor)
+
+    # Priority queue for moves in history table
+    moveQueue= createMoveQueue(historyTable, moveList, myGame, playerMoveColor)
+
     # Check if any moves put the player in check
-    for move in moveList:
+    while not moveQueue.empty():
+        historyValue,  move = moveQueue.get()
+
         # Creates a FEN based on the move made
         newFen = generateFen(myGame, move, playerMoveColor)
 
@@ -47,7 +90,7 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
             tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
             score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), playerMoveColor,
-                               tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta)
+                               tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable)
 
             if score is not None:
                 if score > alpha:
@@ -58,10 +101,16 @@ def minimaxMove(myGame, depth, playerMoveColor, changeCount, moveHistory, turnNu
                 elif score == alpha:
                     validMoves.append(moveScore(move, score))
 
-    return random.choice(validMoves).myMove, alpha
+    # Move to be made
+    moveToMake = random.choice(validMoves).myMove
+    # Increments value in history table
+    incrementHistoryTable(myGame.fen, historyTable)
+
+    return moveToMake, score
 
 
-def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta):
+
+def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta, historyTable):
     """
     Gets the max possible move for the passed FEN state
     :param fen: FEN state to create moves for
@@ -79,11 +128,19 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
 
         # Check if this move creates a draw
         if checkForDraw(changeCount, moveHistory):
+            incrementHistoryTable(fen, historyTable)
             return 0
 
             # Recursive base case
         elif depth <= 0:
-            return getScoreFromFen(fen, myColor)
+            score = getScoreFromFen(fen, myColor)
+            if checkIfInCheck(fen, getOppositeColorStr(myColor)):
+                print("ADD CHECK SCORE")
+                # Add points if move puts player into check to create check incentive
+                score += 20
+
+            incrementHistoryTable(fen, historyTable)
+            return score
 
         else:
             myGame = gameState(fen)
@@ -91,8 +148,13 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
             # List of all possible moves
             moveList = getMove(myGame, playerMoveColor)
 
+            # Priority queue for moves in history table
+            moveQueue = createMoveQueue(historyTable, moveList, myGame, playerMoveColor)
+
             # Check if any moves put the player in check
-            for move in moveList:
+            while not moveQueue.empty():
+                historyValue, move = moveQueue.get()
+
                 # Creates a FEN based on the move made
                 newFen = generateFen(myGame, move, playerMoveColor)
 
@@ -106,7 +168,7 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                     tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
                     score = getMinMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor,
-                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta)
+                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable)
 
                     # Make sure a value is returned
                     if score is not None:
@@ -121,12 +183,13 @@ def getMaxMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                         # Set new best score found
                         if highscore is None or score > highscore :
                             highscore = score
-
+        incrementHistoryTable(fen, historyTable)
         return highscore
     else:
+        incrementHistoryTable(fen, historyTable)
         return getScoreFromFen(fen, myColor)
 
-def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta):
+def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, turnNum, alpha, beta, historyTable):
     """
     Gets the min possible move for the passed FEN state
     :param fen: FEN state to create moves for
@@ -142,13 +205,14 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
     if "K" in fen and "k" in fen:
         highscore = None
 
-
         # Check if this move creates a draw
         if checkForDraw(changeCount, moveHistory):
+            incrementHistoryTable(fen, historyTable)
             return 0
 
         # Recursive base case
         elif depth <= 0:
+            incrementHistoryTable(fen, historyTable)
             return getScoreFromFen(fen, myColor)
 
         else:
@@ -157,8 +221,12 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
             # List of all possible moves
             moveList = getMove(myGame, playerMoveColor)
 
+            # Priority queue for moves in history table
+            moveQueue = createMoveQueue(historyTable, moveList, myGame, playerMoveColor)
+
             # Check if any moves put the player in check
-            for move in moveList:
+            while not moveQueue.empty():
+                historyValue, move = moveQueue.get()
                 # Creates a FEN based on the move made
                 newFen = generateFen(myGame, move, playerMoveColor)
 
@@ -173,7 +241,7 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
                     tempChangeCount = updateChangeCount(changeCount, move, myGame)
 
                     score = getMaxMove(newFen, depth - 1, getOppositeColorStr(playerMoveColor), myColor,
-                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta)
+                                       tempChangeCount, newMoveHistory, tempTurnNum, alpha, beta, historyTable)
 
                     if score is not None:
                         if score <= alpha:
@@ -183,8 +251,12 @@ def getMinMove(fen, depth, playerMoveColor, myColor, changeCount, moveHistory, t
 
                         if highscore is None or score > highscore :
                             highscore = score
+
+        incrementHistoryTable(fen, historyTable)
         return  highscore
     else:
+
+        incrementHistoryTable(fen, historyTable)
         return getScoreFromFen(fen, myColor)
 
 def heuristicScore(blackScore, whiteScore, myColor):

@@ -21,6 +21,15 @@ class pieceMove:
         """
         print(self.piece.type, self.rank, self.file, self.promotion, sep="\t")
 
+    def __lt__(self, other):
+        """
+        Added less than operator for priority queue always return true 
+        This is because the operator is only used with a priority queue and the priorirty queue
+        is sorting based on move history score
+        :param other: Other move
+        :return: True
+        """
+        return True
 
 def getMove(myGame, colorToMove):
     """
